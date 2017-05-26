@@ -1,0 +1,36 @@
+---
+dist: trusty
+language: rust
+services: docker
+sudo: required
+rust:
+  - stable
+  - beta
+  - nightly
+
+env:
+  global:
+    - CRATE_NAME=partial-io
+    # Default job
+    - TARGET=x86_64-unknown-linux-gnu
+
+matrix:
+  include:
+    # Run build on oldest supported rust version.
+    - rust: 1.17.0
+      after_success:
+        - |
+            pip install 'travis-cargo<0.2' --user &&
+            export PATH=$HOME/.local/bin:$PATH
+        - travis-cargo doc
+        - travis-cargo doc-upload
+
+    # Combinations of optional features
+    - env: EXTRA_ARGS="--features tokio"
+    - env: EXTRA_ARGS="--features quickcheck"
+    - env: EXTRA_ARGS="--features 'tokio quickcheck'"
+
+cache: cargo
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
