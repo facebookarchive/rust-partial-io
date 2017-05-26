@@ -1,34 +1,32 @@
 ---
 dist: trusty
 language: rust
-services: docker
-sudo: required
 rust:
   - stable
   - beta
   - nightly
-
 env:
-  global:
-    - CRATE_NAME=partial-io
-    # Default job
-    - TARGET=x86_64-unknown-linux-gnu
+  # Combinations of optional features
+  - FEATURES=''
+  - FEATURES='tokio'
+  - FEATURES='quickcheck'
+  - FEATURES='tokio quickcheck'
 
 matrix:
   include:
-    # Run build on oldest supported rust version.
+    # Run build on oldest supported rust version with all features enabled.
     - rust: 1.17.0
+      env: FEATURES='tokio quickcheck'
       after_success:
         - |
             pip install 'travis-cargo<0.2' --user &&
             export PATH=$HOME/.local/bin:$PATH
-        - travis-cargo doc
+        - travis-cargo doc -- --lib --features "$FEATURES" --no-deps
         - travis-cargo doc-upload
 
-    # Combinations of optional features
-    - env: EXTRA_ARGS="--features tokio"
-    - env: EXTRA_ARGS="--features quickcheck"
-    - env: EXTRA_ARGS="--features 'tokio quickcheck'"
+script:
+  - cargo build --verbose --features "$FEATURES"
+  - cargo test --verbose --features "$FEATURES"
 
 cache: cargo
 before_cache:
