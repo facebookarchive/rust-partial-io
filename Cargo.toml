@@ -1,0 +1,31 @@
+[package]
+name = "partial-io"
+version = "0.1.1"
+authors = ["Siddharth Agarwal <sid0@fb.com>"]
+description = "Helpers to test partial, interrupted and would-block I/O operations."
+documentation = "https://facebookincubator.github.io/rust-partial-io"
+repository = "https://github.com/facebookincubator/rust-partial-io"
+readme = "README.md"
+keywords = ["partial", "interrupted", "wouldblock", "tokio", "quickcheck"]
+categories = ["development-tools::testing", "asynchronous"]
+license = "BSD-3-Clause"
+exclude = [
+  "**/*.bk",
+]
+
+[dependencies]
+futures = { version = "0.1", optional = true }
+quickcheck = { version = "0.4", optional = true }
+tokio-io = { version = "0.1", optional = true }
+
+[dev-dependencies]
+lazy_static = "0.2"
+quickcheck = "0.4"
+tokio-core = "0.1"
+
+[[example]]
+name = "buggy_write"
+required-features = ["quickcheck"]
+
+[features]
+tokio = ["tokio-io", "futures"]
