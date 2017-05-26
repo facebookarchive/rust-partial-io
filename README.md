@@ -48,7 +48,7 @@ features = ["quickcheck"]
 ```
 
 See the
-[documentation](https://facebookincubator.github.io/rust-partial-io/quickcheck_types/index.html)
+[documentation](https://facebookincubator.github.io/rust-partial-io/partial_io/quickcheck_types/index.html)
 for how to use `quickcheck` to generate tests.
 
 ## License
