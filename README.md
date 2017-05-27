@@ -1,4 +1,4 @@
-# partial-io
+# partial-io [![Build Status](https://travis-ci.org/facebookincubator/rust-partial-io.svg?branch=master)](https://travis-ci.org/facebookincubator/rust-partial-io)
 
 A Rust utility library to test resilience of `Read` or `Write` wrappers.
 
