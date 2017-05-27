@@ -7,7 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
-//! QuickCheck support for partial IO operations.
+//! `QuickCheck` support for partial IO operations.
 //!
 //! This module allows sequences of [`PartialOp`]s to be randomly generated. These
 //! sequences can then be fed into a [`PartialRead`], [`PartialWrite`],
@@ -83,10 +83,7 @@ impl<GE> Deref for PartialWithErrors<GE> {
 /// Represents a way to generate `io::ErrorKind` instances.
 ///
 /// See [the module level documentation](index.html) for more.
-pub trait GenError: Clone + Send {
-    /// Create a new object of this kind.
-    fn new() -> Self;
-
+pub trait GenError: Clone + Default + Send {
     /// Optionally generate an `io::ErrorKind` instance.
     fn gen_error<G: Gen>(&mut self, g: &mut G) -> Option<io::ErrorKind>;
 }
@@ -94,28 +91,24 @@ pub trait GenError: Clone + Send {
 /// Generate an `ErrorKind::Interrupted` error 20% of the time.
 ///
 /// See [the module level documentation](index.html) for more.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct GenInterrupted;
 
 /// Generate an `ErrorKind::WouldBlock` error 20% of the time.
 ///
 /// See [the module level documentation](index.html) for more.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct GenWouldBlock;
 
 /// Generate `Interrupted` and `WouldBlock` errors 10% of the time each.
 ///
 /// See [the module level documentation](index.html) for more.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct GenInterruptedWouldBlock;
 
 macro_rules! impl_gen_error {
     ($id: ident, [$($errors:expr),+]) => {
         impl GenError for $id {
-            fn new() -> Self {
-                $id
-            }
-
             fn gen_error<G: Gen>(&mut self, g: &mut G) -> Option<io::ErrorKind> {
                 // 20% chance to generate an error.
                 if g.gen_weighted_bool(5) {
@@ -137,14 +130,10 @@ impl_gen_error!(GenInterruptedWouldBlock,
 /// `PartialOp::Limited` instances.
 ///
 /// See [the module level documentation](index.html) for more.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct GenNoErrors;
 
 impl GenError for GenNoErrors {
-    fn new() -> Self {
-        GenNoErrors
-    }
-
     fn gen_error<G: Gen>(&mut self, _g: &mut G) -> Option<io::ErrorKind> {
         None
     }
@@ -157,7 +146,7 @@ impl<GE> Arbitrary for PartialWithErrors<GE>
         let size = g.size();
         // Generate a sequence of operations. A uniform distribution for this is
         // fine because the goal is to shake bugs out relatively effectively.
-        let mut gen_error = GE::new();
+        let mut gen_error = GE::default();
         let items: Vec<_> = (0..size)
             .map(|_| {
                      match gen_error.gen_error(g) {
@@ -194,13 +183,13 @@ impl Arbitrary for PartialOp {
     }
 
     fn shrink(&self) -> Box<Iterator<Item = Self>> {
-        match self {
+        match *self {
             // Skip 0 because for writers it can mean that writes are no longer
             // accepted.
-            &PartialOp::Limited(n) => {
+            PartialOp::Limited(n) => {
                 Box::new(n.shrink()
                              .filter(|k| k != &0)
-                             .map(|k| PartialOp::Limited(k)))
+                             .map(PartialOp::Limited))
             }
             _ => empty_shrinker(),
         }
