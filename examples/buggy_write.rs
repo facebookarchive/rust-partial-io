@@ -98,7 +98,7 @@ fn main() {
 }
 
 mod test {
-    //! Tests to demonstrate how to use partial-io to catch bugs in buggy_write.
+    //! Tests to demonstrate how to use partial-io to catch bugs in `buggy_write`.
 
     // * 'cargo test' doesn't support running tests inside examples.
     // * We'd like to make it possible to run this example to test it out.
