@@ -12,9 +12,8 @@
 
 use std::cmp;
 use std::io::{self, Read};
-use std::iter::Fuse;
 
-use PartialOp;
+use {PartialOp, make_ops};
 
 /// A reader wrapper that breaks inner `Read` instances up according to the
 /// provided iterator.
@@ -35,22 +34,30 @@ use PartialOp;
 /// assert_eq!(size, 1);
 /// assert_eq!(&out[..1], &[1]);
 /// ```
-pub struct PartialRead<R, I>
-    where I: IntoIterator<Item = PartialOp>
-{
+pub struct PartialRead<R> {
     inner: R,
-    iter: Fuse<I::IntoIter>,
+    ops: Box<Iterator<Item = PartialOp>>,
 }
 
-impl<R, I> PartialRead<R, I>
-    where R: Read,
-          I: IntoIterator<Item = PartialOp>
+impl<R> PartialRead<R>
+    where R: Read
 {
-    pub fn new(inner: R, iter: I) -> Self {
+    /// Creates a new `PartialRead` wrapper over the reader with the specified `PartialOp`s.
+    pub fn new<I>(inner: R, iter: I) -> Self
+        where I: IntoIterator<Item = PartialOp> + 'static
+    {
         PartialRead {
             inner: inner,
-            iter: iter.into_iter().fuse(),
+            ops: make_ops(iter),
         }
+    }
+
+    /// Sets the `PartialOp`s for this reader.
+    pub fn set_ops<I>(&mut self, iter: I) -> &mut Self
+        where I: IntoIterator<Item = PartialOp> + 'static
+    {
+        self.ops = make_ops(iter);
+        self
     }
 
     /// Acquires a reference to the underlying reader.
@@ -69,12 +76,11 @@ impl<R, I> PartialRead<R, I>
     }
 }
 
-impl<R, I> Read for PartialRead<R, I>
-    where R: Read,
-          I: IntoIterator<Item = PartialOp>
+impl<R> Read for PartialRead<R>
+    where R: Read
 {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        match self.iter.next() {
+        match self.ops.next() {
             Some(PartialOp::Limited(n)) => {
                 let len = cmp::min(n, buf.len());
                 self.inner.read(&mut buf[..len])
