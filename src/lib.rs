@@ -8,6 +8,9 @@
  *
  */
 #![deny(warnings)]
+// futures-rs 0.1.14 changed task::park() and unpark() to current() and
+// notify(), respectively. Keep using the old versions for compat.
+#![allow(deprecated)]
 
 //! Helpers for testing I/O behavior with partial, interrupted and blocking reads and writes.
 //!
