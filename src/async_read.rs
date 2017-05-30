@@ -15,12 +15,11 @@
 
 use std::cmp;
 use std::io::{self, Read};
-use std::iter::Fuse;
 
 use futures::task;
 use tokio_io::AsyncRead;
 
-use PartialOp;
+use {PartialOp, make_ops};
 
 /// A wrapper that breaks inner `AsyncRead` instances up according to the
 /// provided iterator.
@@ -59,22 +58,30 @@ use PartialOp;
 ///     assert_eq!(&out[..3], &[1, 2, 0]);
 /// }
 /// ```
-pub struct PartialAsyncRead<R, I>
-    where I: IntoIterator<Item = PartialOp>
-{
+pub struct PartialAsyncRead<R> {
     inner: R,
-    iter: Fuse<I::IntoIter>,
+    ops: Box<Iterator<Item = PartialOp>>,
 }
 
-impl<R, I> PartialAsyncRead<R, I>
-    where R: AsyncRead,
-          I: IntoIterator<Item = PartialOp>
+impl<R> PartialAsyncRead<R>
+    where R: AsyncRead
 {
-    pub fn new(inner: R, iter: I) -> Self {
+    /// Creates a new `PartialAsyncRead` wrapper over the reader with the specified `PartialOp`s.
+    pub fn new<I>(inner: R, iter: I) -> Self
+        where I: IntoIterator<Item = PartialOp> + 'static
+    {
         PartialAsyncRead {
             inner: inner,
-            iter: iter.into_iter().fuse(),
+            ops: make_ops(iter),
         }
+    }
+
+    /// Sets the `PartialOp`s for this reader.
+    pub fn set_ops<I>(&mut self, iter: I) -> &mut Self
+        where I: IntoIterator<Item = PartialOp> + 'static
+    {
+        self.ops = make_ops(iter);
+        self
     }
 
     /// Acquires a reference to the underlying reader.
@@ -93,12 +100,11 @@ impl<R, I> PartialAsyncRead<R, I>
     }
 }
 
-impl<R, I> Read for PartialAsyncRead<R, I>
-    where R: AsyncRead,
-          I: IntoIterator<Item = PartialOp>
+impl<R> Read for PartialAsyncRead<R>
+    where R: AsyncRead
 {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        match self.iter.next() {
+        match self.ops.next() {
             Some(PartialOp::Limited(n)) => {
                 let len = cmp::min(n, buf.len());
                 self.inner.read(&mut buf[..len])
@@ -116,8 +122,4 @@ impl<R, I> Read for PartialAsyncRead<R, I>
     }
 }
 
-impl<R, I> AsyncRead for PartialAsyncRead<R, I>
-    where R: AsyncRead,
-          I: IntoIterator<Item = PartialOp>
-{
-}
+impl<R> AsyncRead for PartialAsyncRead<R> where R: AsyncRead {}
