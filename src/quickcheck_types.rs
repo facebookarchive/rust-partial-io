@@ -187,9 +187,7 @@ impl Arbitrary for PartialOp {
             // Skip 0 because for writers it can mean that writes are no longer
             // accepted.
             PartialOp::Limited(n) => {
-                Box::new(n.shrink()
-                             .filter(|k| k != &0)
-                             .map(PartialOp::Limited))
+                Box::new(n.shrink().filter(|k| k != &0).map(PartialOp::Limited))
             }
             _ => empty_shrinker(),
         }

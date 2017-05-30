@@ -11,6 +11,7 @@
 //! a provided iterator.
 
 use std::cmp;
+use std::fmt;
 use std::io::{self, Read};
 
 use {PartialOp, make_ops};
@@ -91,5 +92,15 @@ impl<R> Read for PartialRead<R>
             Some(PartialOp::Unlimited) |
             None => self.inner.read(buf),
         }
+    }
+}
+
+impl<R> fmt::Debug for PartialRead<R>
+    where R: fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("PartialRead")
+            .field("inner", &self.inner)
+            .finish()
     }
 }

@@ -11,6 +11,7 @@
 //! provided iterator.
 
 use std::cmp;
+use std::fmt;
 use std::io::{self, Write};
 
 use {PartialOp, make_ops};
@@ -102,5 +103,15 @@ impl<W> Write for PartialWrite<W>
             }
             _ => self.inner.flush(),
         }
+    }
+}
+
+impl<W> fmt::Debug for PartialWrite<W>
+    where W: fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("PartialWrite")
+            .field("inner", &self.inner)
+            .finish()
     }
 }
