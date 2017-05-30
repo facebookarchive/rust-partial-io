@@ -1,6 +1,6 @@
 [package]
 name = "partial-io"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Siddharth Agarwal <sid0@fb.com>"]
 description = "Helpers to test partial, interrupted and would-block I/O operations."
 documentation = "https://facebookincubator.github.io/rust-partial-io"

@@ -12,7 +12,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-partial-io = "0.1"
+partial-io = "0.2"
 ```
 
 Next, add this to your crate:
@@ -31,9 +31,8 @@ wrappers for `AsyncRead` and `AsyncWrite` instances. Enable the `tokio` feature
 to use this:
 
 ```toml
-[dev-dependencies.partial-io]
-version = "0.1"
-features = ["tokio"]
+[dev-dependencies]
+partial_io = { version = "0.2", features = ["tokio"] }
 ```
 
 ## QuickCheck integration
@@ -42,9 +41,8 @@ features = ["tokio"]
 random test cases. Enable the `quickcheck` feature to use this:
 
 ```toml
-[dev-dependencies.partial-io]
-version = "0.1"
-features = ["quickcheck"]
+[dev-dependencies]
+partial_io = { version = "0.2", features = ["quickcheck"] }
 ```
 
 See the
