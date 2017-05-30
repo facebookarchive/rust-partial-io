@@ -14,6 +14,7 @@
 //! causes `futures` to try writing or flushing again.
 
 use std::cmp;
+use std::fmt;
 use std::io::{self, Write};
 
 use futures::{Poll, task};
@@ -131,5 +132,15 @@ impl<W> AsyncWrite for PartialAsyncWrite<W>
 {
     fn shutdown(&mut self) -> Poll<(), io::Error> {
         self.inner.shutdown()
+    }
+}
+
+impl<W> fmt::Debug for PartialAsyncWrite<W>
+    where W: fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("PartialAsyncWrite")
+            .field("inner", &self.inner)
+            .finish()
     }
 }

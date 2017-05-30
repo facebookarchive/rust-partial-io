@@ -14,6 +14,7 @@
 //! causes `futures` to try writing or flushing again.
 
 use std::cmp;
+use std::fmt;
 use std::io::{self, Read};
 
 use futures::task;
@@ -123,3 +124,13 @@ impl<R> Read for PartialAsyncRead<R>
 }
 
 impl<R> AsyncRead for PartialAsyncRead<R> where R: AsyncRead {}
+
+impl<R> fmt::Debug for PartialAsyncRead<R>
+    where R: fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("PartialAsyncRead")
+            .field("inner", &self.inner)
+            .finish()
+    }
+}
