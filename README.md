@@ -32,7 +32,7 @@ to use this:
 
 ```toml
 [dev-dependencies]
-partial_io = { version = "0.2", features = ["tokio"] }
+partial-io = { version = "0.2", features = ["tokio"] }
 ```
 
 ## QuickCheck integration
@@ -42,7 +42,7 @@ random test cases. Enable the `quickcheck` feature to use this:
 
 ```toml
 [dev-dependencies]
-partial_io = { version = "0.2", features = ["quickcheck"] }
+partial-io = { version = "0.2", features = ["quickcheck"] }
 ```
 
 See the
