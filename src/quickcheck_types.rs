@@ -42,12 +42,15 @@
 //!
 //! For a detailed example, see `examples/buggy_write.rs` in this repository.
 //!
+//! For a real-world example, see the [tests in `bzip2-rs`].
+//!
 //! [`PartialOp`]: ../struct.PartialOp.html
 //! [`PartialRead`]: ../struct.PartialRead.html
 //! [`PartialWrite`]: ../struct.PartialWrite.html
 //! [`PartialAsyncRead`]: ../struct.PartialAsyncRead.html
 //! [`PartialAsyncWrite`]: ../struct.PartialAsyncWrite.html
 //! [`GenError`]: trait.GenError.html
+//! [tests in `bzip2-rs`]: https://github.com/alexcrichton/bzip2-rs/blob/master/src/write.rs
 
 use std::io;
 use std::marker::PhantomData;
