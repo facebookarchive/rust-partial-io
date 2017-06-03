@@ -24,11 +24,39 @@
 //!   implementations. These implementations are task-aware, so they will know
 //!   how to pause and unpause tasks if they return a `WouldBlock` error.
 //! * With the optional `quickcheck` feature, generation of random sequences of
-//!   operations which can be fed into any of the wrapper. See the
+//!   operations which can be provided to one of the wrappers. See the
 //!   [`quickcheck_types` documentation](quickcheck_types/index.html) for more.
 //!
-//! `partial-io` is particularly useful for `Read` and `Write` implementations
-//! with internal buffers, which can be fiddly to get right.
+//! # Motivation
+//!
+//! A `Read` or `Write` wrapper is conceptually simple but can be difficult to
+//! get right, especially if the wrapper has an internal buffer. Common
+//! issues include:
+//!
+//! * A partial read or write, even without an error, might leave the wrapper
+//!   in an invalid state ([example fix][1]).
+//!
+//! With `tokio`'s `AsyncRead` and `AsyncWrite`:
+//!
+//! * `read_to_end` or `write_all` within the wrapper might be partly
+//!   successful but then error out. These functions will return the error
+//!   without informing the caller of how much was read or written. Wrappers
+//!   with an internal buffer will want to advance their state corresponding
+//!   to the partial success, so they can't use `read_to_end` or `write_all`
+//!   ([example fix][2]).
+//! * Instances cannot propagate `ErrorKind::Interrupted` failures up. Wrappers
+//!   must always retry.
+//! * Instances must propagate `ErrorKind::WouldBlock` failures up, but that
+//!   shouldn't leave them in an invalid state.
+//!
+//! These situations can be hard to think about and hard to test.
+//!
+//! `partial-io` can help in two ways:
+//!
+//! 1. For a known bug involving any of these situations, `partial-io` can help
+//!    you write a test.
+//! 2. With the `quickcheck` feature enabled, `partial-io` can also help shake
+//!    out bugs in your wrapper. See [`quickcheck_types`] for more.
 //!
 //! # Examples
 //!
@@ -54,10 +82,16 @@
 //! assert_eq!(&out[..13], b"Hello, world!");
 //! ```
 //!
+//! For a real-world example, see the [tests in `zstd-rs`].
+//!
 //! [`PartialRead`]: struct.PartialRead.html
 //! [`PartialWrite`]: struct.PartialWrite.html
 //! [`PartialAsyncRead`]: struct.PartialAsyncRead.html
 //! [`PartialAsyncWrite`]: struct.PartialAsyncWrite.html
+//! [`quickcheck_types`]: quickcheck_types/index.html
+//! [1]: https://github.com/gyscos/zstd-rs/commit/3123e418595f6badd5b06db2a14c4ff4555e7705
+//! [2]: https://github.com/gyscos/zstd-rs/commit/02dc9d9a3419618fc729542b45c96c32b0f178bb
+//! [tests in `zstd-rs`]: https://github.com/gyscos/zstd-rs/blob/master/src/stream/mod.rs
 
 #[cfg(feature = "tokio")]
 extern crate futures;
