@@ -29,3 +29,6 @@ required-features = ["quickcheck"]
 
 [features]
 tokio = ["tokio-io", "futures"]
+
+[badges]
+travis-ci = { repository = "facebookincubator/rust-partial-io" }
