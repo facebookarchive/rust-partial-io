@@ -10,6 +10,7 @@ keywords = ["partial", "interrupted", "wouldblock", "tokio", "quickcheck"]
 categories = ["development-tools::testing", "asynchronous"]
 license = "BSD-3-Clause"
 exclude = [
+  "TARGETS",
   "**/*.bk",
 ]
 
