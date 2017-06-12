@@ -1,9 +1,9 @@
 [package]
 name = "partial-io"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Siddharth Agarwal <sid0@fb.com>"]
 description = "Helpers to test partial, interrupted and would-block I/O operations."
-documentation = "https://facebookincubator.github.io/rust-partial-io"
+documentation = "https://docs.rs/partial-io"
 repository = "https://github.com/facebookincubator/rust-partial-io"
 readme = "README.md"
 keywords = ["partial", "interrupted", "wouldblock", "tokio", "quickcheck"]
@@ -33,3 +33,6 @@ tokio = ["tokio-io", "futures"]
 
 [badges]
 travis-ci = { repository = "facebookincubator/rust-partial-io" }
+
+[package.metadata.docs.rs]
+features = ["tokio", "quickcheck"]

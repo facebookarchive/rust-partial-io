@@ -4,7 +4,9 @@ A Rust utility library to test resilience of `Read` or `Write` wrappers.
 
 If you'd like to help out, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-[Documentation](https://facebookincubator.github.io/rust-partial-io)
+[Documentation (latest release)](https://docs.rs/partial-io)
+
+[Documentation (master)](https://facebookincubator.github.io/rust-partial-io)
 
 ## Quick start
 
