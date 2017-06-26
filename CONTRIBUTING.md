@@ -14,8 +14,7 @@ We actively welcome your pull requests.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes (`cargo test`).
-5. Make sure your code is well-formatted (`cargo install rustfmt`, then
-  `cargo fmt`).
+5. Make sure your code is well-formatted (using `rustfmt`).
 6. If you haven't already, complete the Contributor License Agreement ("CLA").
 
 ## Contributor License Agreement ("CLA")
@@ -48,6 +47,11 @@ code. This means:
 
 * 4 spaces for indentation rather than tabs
 * 80 character line length recommended, up to 100 characters if necessary.
+
+This project uses the `rustfmt` currently based on nightly Rust
+(`rustfmt-nightly` as of June 2017). For instructions on how to install it, see
+the
+[`rustfmt` README](https://github.com/rust-lang-nursery/rustfmt/#installation).
 
 ## License
 By contributing to rust-partial-io, you agree that your contributions will be

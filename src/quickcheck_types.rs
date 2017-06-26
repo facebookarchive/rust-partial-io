@@ -126,8 +126,10 @@ macro_rules! impl_gen_error {
 
 impl_gen_error!(GenInterrupted, [io::ErrorKind::Interrupted]);
 impl_gen_error!(GenWouldBlock, [io::ErrorKind::WouldBlock]);
-impl_gen_error!(GenInterruptedWouldBlock,
-                [io::ErrorKind::Interrupted, io::ErrorKind::WouldBlock]);
+impl_gen_error!(
+    GenInterruptedWouldBlock,
+    [io::ErrorKind::Interrupted, io::ErrorKind::WouldBlock]
+);
 
 /// Do not generate any errors. The only operations generated will be
 /// `PartialOp::Limited` instances.
@@ -143,7 +145,8 @@ impl GenError for GenNoErrors {
 }
 
 impl<GE> Arbitrary for PartialWithErrors<GE>
-    where GE: GenError + 'static
+where
+    GE: GenError + 'static,
 {
     fn arbitrary<G: Gen>(g: &mut G) -> Self {
         let size = g.size();
@@ -152,13 +155,13 @@ impl<GE> Arbitrary for PartialWithErrors<GE>
         let mut gen_error = GE::default();
         let items: Vec<_> = (0..size)
             .map(|_| {
-                     match gen_error.gen_error(g) {
-                         Some(err) => PartialOp::Err(err),
-                         // Don't generate 0 because for writers it can mean that
-                         // writes are no longer accepted.
-                         None => PartialOp::Limited(g.gen_range(1, size)),
-                     }
-                 })
+                match gen_error.gen_error(g) {
+                    Some(err) => PartialOp::Err(err),
+                    // Don't generate 0 because for writers it can mean that
+                    // writes are no longer accepted.
+                    None => PartialOp::Limited(g.gen_range(1, size)),
+                }
+            })
             .collect();
         PartialWithErrors {
             items: items,
@@ -167,15 +170,12 @@ impl<GE> Arbitrary for PartialWithErrors<GE>
     }
 
     fn shrink(&self) -> Box<Iterator<Item = Self>> {
-        Box::new(self.items
-                     .clone()
-                     .shrink()
-                     .map(|items| {
-                              PartialWithErrors {
-                                  items: items,
-                                  _marker: PhantomData,
-                              }
-                          }))
+        Box::new(self.items.clone().shrink().map(|items| {
+            PartialWithErrors {
+                items: items,
+                _marker: PhantomData,
+            }
+        }))
     }
 }
 

@@ -148,7 +148,8 @@ pub enum PartialOp {
 
 #[inline]
 fn make_ops<I>(iter: I) -> Box<Iterator<Item = PartialOp>>
-    where I: IntoIterator<Item = PartialOp> + 'static
+where
+    I: IntoIterator<Item = PartialOp> + 'static,
 {
     Box::new(iter.into_iter().fuse())
 }
