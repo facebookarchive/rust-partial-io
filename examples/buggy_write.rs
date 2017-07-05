@@ -129,8 +129,10 @@ mod test {
     }
 
     pub fn buggy_write() {
-        let partial = vec![PartialOp::Err(io::ErrorKind::Interrupted),
-                           PartialOp::Unlimited];
+        let partial = vec![
+            PartialOp::Err(io::ErrorKind::Interrupted),
+            PartialOp::Unlimited,
+        ];
         let (hello_res, world_res, flush_res, inner) = buggy_write_internal(partial);
         assert_eq!(hello_res.unwrap_err().kind(), io::ErrorKind::Interrupted);
         assert_eq!(world_res.unwrap(), 5 * 40);
@@ -155,7 +157,9 @@ mod test {
     }
 
     pub fn quickcheck_buggy_write() {
-        quickcheck(quickcheck_buggy_write2 as fn(PartialWithErrors<GenInterrupted>) -> TestResult);
+        quickcheck(
+            quickcheck_buggy_write2 as fn(PartialWithErrors<GenInterrupted>) -> TestResult,
+        );
     }
 
     fn quickcheck_buggy_write2(partial: PartialWithErrors<GenInterrupted>) -> TestResult {
@@ -178,9 +182,16 @@ mod test {
         TestResult::passed()
     }
 
-    fn buggy_write_internal<I>(partial_iter: I)
-                               -> (io::Result<usize>, io::Result<usize>, io::Result<()>, Vec<u8>)
-        where I: IntoIterator<Item = PartialOp> + 'static
+    fn buggy_write_internal<I>(
+        partial_iter: I,
+    ) -> (
+        io::Result<usize>,
+        io::Result<usize>,
+        io::Result<()>,
+        Vec<u8>,
+    )
+    where
+        I: IntoIterator<Item = PartialOp> + 'static,
     {
         let inner = Vec::new();
         let partial_writer = PartialWrite::new(inner, partial_iter);
