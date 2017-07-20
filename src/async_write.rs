@@ -15,10 +15,10 @@
 
 use std::cmp;
 use std::fmt;
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 
 use futures::{Poll, task};
-use tokio_io::AsyncWrite;
+use tokio_io::{AsyncRead, AsyncWrite};
 
 use {PartialOp, make_ops};
 
@@ -140,9 +140,27 @@ impl<W> AsyncWrite for PartialAsyncWrite<W>
 where
     W: AsyncWrite,
 {
+    #[inline]
     fn shutdown(&mut self) -> Poll<(), io::Error> {
         self.inner.shutdown()
     }
+}
+
+// Forwarding impls to support duplex structs.
+impl<W> Read for PartialAsyncWrite<W>
+where
+    W: AsyncWrite + Read,
+{
+    #[inline]
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.inner.read(buf)
+    }
+}
+
+impl<W> AsyncRead for PartialAsyncWrite<W>
+where
+    W: AsyncRead + AsyncWrite,
+{
 }
 
 impl<W> fmt::Debug for PartialAsyncWrite<W>

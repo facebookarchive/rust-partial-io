@@ -15,10 +15,10 @@
 
 use std::cmp;
 use std::fmt;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 
-use futures::task;
-use tokio_io::AsyncRead;
+use futures::{Poll, task};
+use tokio_io::{AsyncRead, AsyncWrite};
 
 use {PartialOp, make_ops};
 
@@ -133,6 +133,32 @@ impl<R> AsyncRead for PartialAsyncRead<R>
 where
     R: AsyncRead,
 {
+}
+
+// Forwarding impls to support duplex structs.
+impl<R> Write for PartialAsyncRead<R>
+where
+    R: AsyncRead + Write,
+{
+    #[inline]
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.inner.write(buf)
+    }
+
+    #[inline]
+    fn flush(&mut self) -> io::Result<()> {
+        self.inner.flush()
+    }
+}
+
+impl<R> AsyncWrite for PartialAsyncRead<R>
+where
+    R: AsyncRead + AsyncWrite,
+{
+    #[inline]
+    fn shutdown(&mut self) -> Poll<(), io::Error> {
+        self.inner.shutdown()
+    }
 }
 
 impl<R> fmt::Debug for PartialAsyncRead<R>

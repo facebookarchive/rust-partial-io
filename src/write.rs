@@ -12,7 +12,7 @@
 
 use std::cmp;
 use std::fmt;
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 
 use {PartialOp, make_ops};
 
@@ -112,6 +112,17 @@ where
             }
             _ => self.inner.flush(),
         }
+    }
+}
+
+// Forwarding impl to support duplex structs.
+impl<W> Read for PartialWrite<W>
+where
+    W: Read + Write,
+{
+    #[inline]
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.inner.read(buf)
     }
 }
 
