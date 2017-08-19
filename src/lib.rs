@@ -111,13 +111,13 @@ mod write;
 
 use std::io;
 
-#[cfg(feature = "quickcheck")]
-pub use quickcheck_types::{GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors,
-                           GenWouldBlock, PartialWithErrors};
 #[cfg(feature = "tokio")]
 pub use async_read::PartialAsyncRead;
 #[cfg(feature = "tokio")]
 pub use async_write::PartialAsyncWrite;
+#[cfg(feature = "quickcheck")]
+pub use quickcheck_types::{GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors,
+                           GenWouldBlock, PartialWithErrors};
 pub use read::PartialRead;
 pub use write::PartialWrite;
 

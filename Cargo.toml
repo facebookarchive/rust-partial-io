@@ -1,6 +1,6 @@
 [package]
 name = "partial-io"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Siddharth Agarwal <sid0@fb.com>"]
 description = "Helpers to test partial, interrupted and would-block I/O operations."
 documentation = "https://docs.rs/partial-io"
