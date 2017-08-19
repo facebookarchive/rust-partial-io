@@ -17,10 +17,10 @@ use std::cmp;
 use std::fmt;
 use std::io::{self, Read, Write};
 
-use futures::{Poll, task};
+use futures::{task, Poll};
 use tokio_io::{AsyncRead, AsyncWrite};
 
-use {PartialOp, make_ops};
+use {make_ops, PartialOp};
 
 /// A wrapper that breaks inner `AsyncRead` instances up according to the
 /// provided iterator.
