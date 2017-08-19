@@ -56,7 +56,7 @@ use std::io;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
-use quickcheck::{Arbitrary, Gen, empty_shrinker};
+use quickcheck::{empty_shrinker, Arbitrary, Gen};
 
 use PartialOp;
 
