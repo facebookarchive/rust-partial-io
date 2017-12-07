@@ -109,7 +109,7 @@ mod test {
 
     use std::io::{self, Write};
 
-    use quickcheck::{TestResult, quickcheck};
+    use quickcheck::{quickcheck, TestResult};
 
     use partial_io::{GenInterrupted, PartialOp, PartialWithErrors, PartialWrite};
 
@@ -158,7 +158,8 @@ mod test {
 
     pub fn quickcheck_buggy_write() {
         quickcheck(
-            quickcheck_buggy_write2 as fn(PartialWithErrors<GenInterrupted>) -> TestResult,
+            quickcheck_buggy_write2
+                as fn(PartialWithErrors<GenInterrupted>) -> TestResult,
         );
     }
 
@@ -192,6 +193,7 @@ mod test {
     )
     where
         I: IntoIterator<Item = PartialOp> + 'static,
+        I::IntoIter: Send,
     {
         let inner = Vec::new();
         let partial_writer = PartialWrite::new(inner, partial_iter);

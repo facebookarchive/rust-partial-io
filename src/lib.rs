@@ -147,9 +147,15 @@ pub enum PartialOp {
 }
 
 #[inline]
-fn make_ops<I>(iter: I) -> Box<Iterator<Item = PartialOp>>
+fn make_ops<I>(iter: I) -> Box<Iterator<Item = PartialOp> + Send>
 where
     I: IntoIterator<Item = PartialOp> + 'static,
+    I::IntoIter: Send,
 {
     Box::new(iter.into_iter().fuse())
+}
+
+#[cfg(test)]
+mod tests {
+    pub fn assert_send<S: Send>(_: S) {}
 }

@@ -37,7 +37,7 @@ use {make_ops, PartialOp};
 /// ```
 pub struct PartialRead<R> {
     inner: R,
-    ops: Box<Iterator<Item = PartialOp>>,
+    ops: Box<Iterator<Item = PartialOp> + Send>,
 }
 
 impl<R> PartialRead<R>
@@ -48,6 +48,7 @@ where
     pub fn new<I>(inner: R, iter: I) -> Self
     where
         I: IntoIterator<Item = PartialOp> + 'static,
+        I::IntoIter: Send,
     {
         PartialRead {
             inner: inner,
@@ -59,6 +60,7 @@ where
     pub fn set_ops<I>(&mut self, iter: I) -> &mut Self
     where
         I: IntoIterator<Item = PartialOp> + 'static,
+        I::IntoIter: Send,
     {
         self.ops = make_ops(iter);
         self
@@ -123,5 +125,20 @@ where
         f.debug_struct("PartialRead")
             .field("inner", &self.inner)
             .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::io::Cursor;
+    use std::iter;
+
+    use tests::assert_send;
+
+    #[test]
+    fn test_sendable() {
+        assert_send(PartialRead::new(Cursor::new(vec![42u8]), iter::empty()));
     }
 }
