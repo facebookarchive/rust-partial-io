@@ -157,10 +157,7 @@ mod test {
     }
 
     pub fn quickcheck_buggy_write() {
-        quickcheck(
-            quickcheck_buggy_write2
-                as fn(PartialWithErrors<GenInterrupted>) -> TestResult,
-        );
+        quickcheck(quickcheck_buggy_write2 as fn(PartialWithErrors<GenInterrupted>) -> TestResult);
     }
 
     fn quickcheck_buggy_write2(partial: PartialWithErrors<GenInterrupted>) -> TestResult {

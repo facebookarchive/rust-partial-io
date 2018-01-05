@@ -170,11 +170,9 @@ where
     }
 
     fn shrink(&self) -> Box<Iterator<Item = Self>> {
-        Box::new(self.items.clone().shrink().map(|items| {
-            PartialWithErrors {
-                items: items,
-                _marker: PhantomData,
-            }
+        Box::new(self.items.clone().shrink().map(|items| PartialWithErrors {
+            items: items,
+            _marker: PhantomData,
         }))
     }
 }

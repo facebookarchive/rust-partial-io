@@ -1,6 +1,6 @@
 [package]
 name = "partial-io"
-version = "0.2.5"
+version = "0.3.0"
 authors = ["Siddharth Agarwal <sid0@fb.com>"]
 description = "Helpers to test partial, interrupted and would-block I/O operations."
 documentation = "https://docs.rs/partial-io"
@@ -16,12 +16,12 @@ exclude = [
 
 [dependencies]
 futures = { version = "0.1", optional = true }
-quickcheck = { version = "0.4", optional = true }
+quickcheck = { version = "0.6", optional = true }
 tokio-io = { version = "0.1", optional = true }
 
 [dev-dependencies]
-lazy_static = "0.2"
-quickcheck = "0.4"
+lazy_static = "1"
+quickcheck = "0.6"
 tokio-core = "0.1"
 
 [[example]]
