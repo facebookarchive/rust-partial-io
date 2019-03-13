@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+
 //! This module contains a writer wrapper that breaks writes up according to a
 //! provided iterator.
 
@@ -14,7 +15,7 @@ use std::cmp;
 use std::fmt;
 use std::io::{self, Read, Write};
 
-use {make_ops, PartialOp};
+use crate::{make_ops, PartialOp};
 
 /// A writer wrapper that breaks inner `Write` instances up according to the
 /// provided iterator.
@@ -37,7 +38,7 @@ use {make_ops, PartialOp};
 /// ```
 pub struct PartialWrite<W> {
     inner: W,
-    ops: Box<Iterator<Item = PartialOp> + Send>,
+    ops: Box<dyn Iterator<Item = PartialOp> + Send>,
 }
 
 impl<W> PartialWrite<W>
@@ -51,7 +52,7 @@ where
         I::IntoIter: Send,
     {
         PartialWrite {
-            inner: inner,
+            inner,
             // Use fuse here so that we don't keep calling the inner iterator
             // once it's returned None.
             ops: make_ops(iter),
@@ -128,7 +129,7 @@ impl<W> fmt::Debug for PartialWrite<W>
 where
     W: fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("PartialWrite")
             .field("inner", &self.inner)
             .finish()
@@ -139,13 +140,12 @@ where
 mod tests {
     use super::*;
 
-    use std::io::Cursor;
-    use std::iter;
+    use std::fs::File;
 
-    use tests::assert_send;
+    use crate::tests::assert_send;
 
     #[test]
     fn test_sendable() {
-        assert_send(PartialWrite::new(Cursor::new(vec![42u8]), iter::empty()));
+        assert_send::<PartialWrite<File>>();
     }
 }

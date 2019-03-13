@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+
 //! This module contains an `AsyncWrite` wrapper that breaks writes up
 //! according to a provided iterator.
 //!
@@ -20,7 +21,7 @@ use std::io::{self, Read, Write};
 use futures::{task, Poll};
 use tokio_io::{AsyncRead, AsyncWrite};
 
-use {make_ops, PartialOp};
+use crate::{make_ops, PartialOp};
 
 /// A wrapper that breaks inner `AsyncWrite` instances up according to the
 /// provided iterator.
@@ -61,7 +62,7 @@ use {make_ops, PartialOp};
 /// ```
 pub struct PartialAsyncWrite<W> {
     inner: W,
-    ops: Box<Iterator<Item = PartialOp> + Send>,
+    ops: Box<dyn Iterator<Item = PartialOp> + Send>,
 }
 
 impl<W> PartialAsyncWrite<W>
@@ -75,7 +76,7 @@ where
         I::IntoIter: Send,
     {
         PartialAsyncWrite {
-            inner: inner,
+            inner,
             ops: make_ops(iter),
         }
     }
@@ -163,17 +164,13 @@ where
     }
 }
 
-impl<W> AsyncRead for PartialAsyncWrite<W>
-where
-    W: AsyncRead + AsyncWrite,
-{
-}
+impl<W> AsyncRead for PartialAsyncWrite<W> where W: AsyncRead + AsyncWrite {}
 
 impl<W> fmt::Debug for PartialAsyncWrite<W>
 where
     W: fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("PartialAsyncWrite")
             .field("inner", &self.inner)
             .finish()
@@ -184,16 +181,12 @@ where
 mod tests {
     use super::*;
 
-    use std::io::Cursor;
-    use std::iter;
+    use std::fs::File;
 
-    use tests::assert_send;
+    use crate::tests::assert_send;
 
     #[test]
     fn test_sendable() {
-        assert_send(PartialAsyncWrite::new(
-            Cursor::new(vec![42u8]),
-            iter::empty(),
-        ));
+        assert_send::<PartialAsyncWrite<File>>();
     }
 }

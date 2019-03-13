@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+
 //! This module contains an `AsyncRead` wrapper that breaks its inputs up
 //! according to a provided iterator.
 //!
@@ -20,7 +21,7 @@ use std::io::{self, Read, Write};
 use futures::{task, Poll};
 use tokio_io::{AsyncRead, AsyncWrite};
 
-use {make_ops, PartialOp};
+use crate::{make_ops, PartialOp};
 
 /// A wrapper that breaks inner `AsyncRead` instances up according to the
 /// provided iterator.
@@ -61,7 +62,7 @@ use {make_ops, PartialOp};
 /// ```
 pub struct PartialAsyncRead<R> {
     inner: R,
-    ops: Box<Iterator<Item = PartialOp> + Send>,
+    ops: Box<dyn Iterator<Item = PartialOp> + Send>,
 }
 
 impl<R> PartialAsyncRead<R>
@@ -75,7 +76,7 @@ where
         I::IntoIter: Send,
     {
         PartialAsyncRead {
-            inner: inner,
+            inner,
             ops: make_ops(iter),
         }
     }
@@ -131,11 +132,7 @@ where
     }
 }
 
-impl<R> AsyncRead for PartialAsyncRead<R>
-where
-    R: AsyncRead,
-{
-}
+impl<R> AsyncRead for PartialAsyncRead<R> where R: AsyncRead {}
 
 // Forwarding impls to support duplex structs.
 impl<R> Write for PartialAsyncRead<R>
@@ -167,7 +164,7 @@ impl<R> fmt::Debug for PartialAsyncRead<R>
 where
     R: fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("PartialAsyncRead")
             .field("inner", &self.inner)
             .finish()
@@ -178,16 +175,12 @@ where
 mod tests {
     use super::*;
 
-    use std::io::Cursor;
-    use std::iter;
+    use std::fs::File;
 
-    use tests::assert_send;
+    use crate::tests::assert_send;
 
     #[test]
     fn test_sendable() {
-        assert_send(PartialAsyncRead::new(
-            Cursor::new(vec![42u8]),
-            iter::empty(),
-        ));
+        assert_send::<PartialAsyncRead<File>>();
     }
 }

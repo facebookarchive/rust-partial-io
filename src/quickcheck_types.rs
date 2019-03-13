@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+
 //! `QuickCheck` support for partial IO operations.
 //!
 //! This module allows sequences of [`PartialOp`]s to be randomly generated. These
@@ -58,7 +59,7 @@ use std::ops::Deref;
 
 use quickcheck::{empty_shrinker, Arbitrary, Gen};
 
-use PartialOp;
+use crate::PartialOp;
 
 /// Given a custom error generator, randomly generate a list of `PartialOp`s.
 #[derive(Clone, Debug)]
@@ -164,14 +165,14 @@ where
             })
             .collect();
         PartialWithErrors {
-            items: items,
+            items,
             _marker: PhantomData,
         }
     }
 
-    fn shrink(&self) -> Box<Iterator<Item = Self>> {
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
         Box::new(self.items.clone().shrink().map(|items| PartialWithErrors {
-            items: items,
+            items,
             _marker: PhantomData,
         }))
     }
@@ -183,7 +184,7 @@ impl Arbitrary for PartialOp {
         unimplemented!();
     }
 
-    fn shrink(&self) -> Box<Iterator<Item = Self>> {
+    fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
         match *self {
             // Skip 0 because for writers it can mean that writes are no longer
             // accepted.

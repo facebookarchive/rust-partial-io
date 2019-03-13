@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+
 #![deny(warnings)]
 // futures-rs 0.1.14 changed task::park() and unpark() to current() and
 // notify(), respectively. Keep using the old versions for compat.
@@ -112,14 +113,16 @@ mod write;
 use std::io;
 
 #[cfg(feature = "tokio")]
-pub use async_read::PartialAsyncRead;
+pub use crate::async_read::PartialAsyncRead;
 #[cfg(feature = "tokio")]
-pub use async_write::PartialAsyncWrite;
+pub use crate::async_write::PartialAsyncWrite;
 #[cfg(feature = "quickcheck")]
-pub use quickcheck_types::{GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors,
-                           GenWouldBlock, PartialWithErrors};
-pub use read::PartialRead;
-pub use write::PartialWrite;
+pub use crate::quickcheck_types::{
+    GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors, GenWouldBlock,
+    PartialWithErrors,
+};
+pub use crate::read::PartialRead;
+pub use crate::write::PartialWrite;
 
 /// What to do the next time an IO operation is performed.
 ///
@@ -147,7 +150,7 @@ pub enum PartialOp {
 }
 
 #[inline]
-fn make_ops<I>(iter: I) -> Box<Iterator<Item = PartialOp> + Send>
+fn make_ops<I>(iter: I) -> Box<dyn Iterator<Item = PartialOp> + Send>
 where
     I: IntoIterator<Item = PartialOp> + 'static,
     I::IntoIter: Send,
@@ -157,5 +160,5 @@ where
 
 #[cfg(test)]
 mod tests {
-    pub fn assert_send<S: Send>(_: S) {}
+    pub fn assert_send<S: Send>() {}
 }
