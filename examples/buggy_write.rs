@@ -30,7 +30,7 @@ pub struct BuggyWrite<W> {
 impl<W: Write> BuggyWrite<W> {
     pub fn new(inner: W) -> Self {
         BuggyWrite {
-            inner: inner,
+            inner,
             buf: Vec::with_capacity(256),
             offset: 0,
         }

@@ -95,13 +95,6 @@
 //! [tests in `zstd-rs`]: https://github.com/gyscos/zstd-rs/blob/master/src/stream/mod.rs
 
 #[cfg(feature = "tokio")]
-extern crate futures;
-#[cfg(feature = "quickcheck")]
-extern crate quickcheck;
-#[cfg(feature = "tokio")]
-extern crate tokio_io;
-
-#[cfg(feature = "tokio")]
 mod async_read;
 #[cfg(feature = "tokio")]
 mod async_write;
