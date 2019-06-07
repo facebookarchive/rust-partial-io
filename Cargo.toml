@@ -12,6 +12,9 @@ categories = ["development-tools::testing", "asynchronous"]
 license = "MIT"
 exclude = [
   "TARGETS",
+  "publish-docs.sh",
+  "rust-partial-io.iml",
+  ".travis.yml",
   "**/*.bk",
 ]
 
