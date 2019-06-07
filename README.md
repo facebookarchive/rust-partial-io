@@ -77,4 +77,4 @@ for how to use `quickcheck` to generate tests.
 
 ## License
 
-`partial-io` is BSD-licensed. We also provide an additional patent grant.
+`partial-io` is MIT-licensed.

@@ -9,7 +9,7 @@ repository = "https://github.com/facebookincubator/rust-partial-io"
 readme = "README.md"
 keywords = ["partial", "interrupted", "wouldblock", "tokio", "quickcheck"]
 categories = ["development-tools::testing", "asynchronous"]
-license = "BSD-3-Clause"
+license = "MIT"
 exclude = [
   "TARGETS",
   "**/*.bk",
