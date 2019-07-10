@@ -27,10 +27,6 @@ use crate::{make_ops, PartialOp};
 /// # Examples
 ///
 /// ```rust
-/// extern crate partial_io;
-/// extern crate tokio_core;
-/// extern crate tokio_io;
-///
 /// use std::io::{self, Cursor};
 ///
 /// fn main() {

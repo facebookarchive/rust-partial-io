@@ -25,7 +25,6 @@
 //! # Examples
 //!
 //! ```rust,ignore
-//! extern crate quickcheck;
 //! use partial_io::{GenInterrupted, PartialWithErrors};
 //!
 //! quickcheck! {

@@ -41,13 +41,6 @@ Add this to your `Cargo.toml`:
 partial-io = "0.3"
 ```
 
-Next, add this to your crate:
-
-```rust
-#[cfg(test)]
-extern crate partial_io;
-```
-
 Now you can use `partial-io` in your tests.
 
 ## Tokio integration

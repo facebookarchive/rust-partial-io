@@ -10,11 +10,6 @@
 #![deny(warnings)]
 #![allow(dead_code)]
 
-#[macro_use]
-extern crate lazy_static;
-extern crate partial_io;
-extern crate quickcheck;
-
 use std::io::{self, Write};
 
 /// A buffered writer whose `write` method is faulty.
@@ -106,6 +101,7 @@ mod test {
 
     use std::io::{self, Write};
 
+    use lazy_static::lazy_static;
     use quickcheck::{quickcheck, TestResult};
 
     use partial_io::{GenInterrupted, PartialOp, PartialWithErrors, PartialWrite};
