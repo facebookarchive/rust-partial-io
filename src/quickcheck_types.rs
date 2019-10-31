@@ -54,6 +54,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 
 use quickcheck::{empty_shrinker, Arbitrary, Gen};
+use rand::{seq::SliceRandom, Rng};
 
 use crate::PartialOp;
 
@@ -111,8 +112,8 @@ macro_rules! impl_gen_error {
         impl GenError for $id {
             fn gen_error<G: Gen>(&mut self, g: &mut G) -> Option<io::ErrorKind> {
                 // 20% chance to generate an error.
-                if g.gen_weighted_bool(5) {
-                    Some(g.choose(&[$($errors,)*]).unwrap().clone())
+                if g.gen_ratio(1, 5) {
+                    Some([$($errors,)*].choose(g).unwrap().clone())
                 } else {
                     None
                 }
