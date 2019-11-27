@@ -104,6 +104,7 @@ mod test {
 
     use lazy_static::lazy_static;
     use quickcheck::{quickcheck, TestResult};
+    use quickcheck_dep as quickcheck;
 
     use partial_io::{GenInterrupted, PartialOp, PartialWithErrors, PartialWrite};
 
@@ -202,5 +203,4 @@ mod test {
 
         (hello_res, world_res, flush_res, inner)
     }
-
 }

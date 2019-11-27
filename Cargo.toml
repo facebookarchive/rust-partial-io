@@ -19,21 +19,26 @@ exclude = [
 ]
 
 [dependencies]
-futures = { version = "0.1", optional = true }
-quickcheck = { version = "0.9", optional = true }
-tokio-io = { version = "0.1", optional = true }
+pin-project = { version = "0.4", optional = true }
+futures = { version = "0.3", optional = true }
+rand = { version = "0.7", optional = true }
+
+# Features and optional dependencies can't have the same name so rename the dependency
+quickcheck_dep = { version = "0.9", package = "quickcheck", optional = true }
+tokio-dep = { version = "0.2", package = "tokio", optional = true }
 
 [dev-dependencies]
 lazy_static = "1"
-quickcheck = "0.9"
-tokio-core = "0.1"
+quickcheck_dep = { version = "0.9", package = "quickcheck" }
+tokio-dep = { version = "0.2", package = "tokio", features = ["full"] }
 
 [[example]]
 name = "buggy_write"
 required-features = ["quickcheck"]
 
 [features]
-tokio = ["tokio-io", "futures"]
+quickcheck = ["rand", "quickcheck_dep"]
+tokio = ["pin-project", "futures", "tokio-dep"]
 
 [badges]
 travis-ci = { repository = "facebookincubator/rust-partial-io" }

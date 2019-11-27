@@ -54,6 +54,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 
 use quickcheck::{empty_shrinker, Arbitrary, Gen};
+use quickcheck_dep as quickcheck;
 use rand::{seq::SliceRandom, Rng};
 
 use crate::PartialOp;
