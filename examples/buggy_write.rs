@@ -202,5 +202,4 @@ mod test {
 
         (hello_res, world_res, flush_res, inner)
     }
-
 }
