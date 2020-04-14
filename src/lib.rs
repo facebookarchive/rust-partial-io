@@ -21,7 +21,7 @@
 //!   [`PartialAsyncWrite`] to wrap existing `AsyncRead` and `AsyncWrite`
 //!   implementations. These implementations are task-aware, so they will know
 //!   how to pause and unpause tasks if they return a `WouldBlock` error.
-//! * With the optional `quickcheck` feature, generation of random sequences of
+//! * With the optional `quickcheck_types` feature, generation of random sequences of
 //!   operations which can be provided to one of the wrappers. See the
 //!   [`quickcheck_types` documentation](quickcheck_types/index.html) for more.
 //!
@@ -53,7 +53,7 @@
 //!
 //! 1. For a known bug involving any of these situations, `partial-io` can help
 //!    you write a test.
-//! 2. With the `quickcheck` feature enabled, `partial-io` can also help shake
+//! 2. With the `quickcheck_types` feature enabled, `partial-io` can also help shake
 //!    out bugs in your wrapper. See [`quickcheck_types`] for more.
 //!
 //! # Examples
@@ -95,7 +95,7 @@
 mod async_read;
 #[cfg(feature = "tokio")]
 mod async_write;
-#[cfg(feature = "quickcheck")]
+#[cfg(feature = "quickcheck_types")]
 pub mod quickcheck_types;
 mod read;
 mod write;
@@ -106,7 +106,7 @@ use std::io;
 pub use crate::async_read::PartialAsyncRead;
 #[cfg(feature = "tokio")]
 pub use crate::async_write::PartialAsyncWrite;
-#[cfg(feature = "quickcheck")]
+#[cfg(feature = "quickcheck_types")]
 pub use crate::quickcheck_types::{
     GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors, GenWouldBlock,
     PartialWithErrors,
