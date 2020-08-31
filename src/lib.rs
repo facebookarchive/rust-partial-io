@@ -21,7 +21,7 @@
 //!   [`PartialAsyncWrite`] to wrap existing `AsyncRead` and `AsyncWrite`
 //!   implementations. These implementations are task-aware, so they will know
 //!   how to pause and unpause tasks if they return a `WouldBlock` error.
-//! * With the optional `quickcheck_types` feature, generation of random sequences of
+//! * With the optional `quickcheck09` feature, generation of random sequences of
 //!   operations which can be provided to one of the wrappers. See the
 //!   [`quickcheck_types` documentation](quickcheck_types/index.html) for more.
 //!
@@ -34,18 +34,16 @@
 //! * A partial read or write, even without an error, might leave the wrapper
 //!   in an invalid state ([example fix][1]).
 //!
-//! With `tokio`'s `AsyncRead` and `AsyncWrite`:
+//! With the `AsyncRead` and `AsyncWrite` provided by `futures` and `tokio`:
 //!
-//! * `read_to_end` or `write_all` within the wrapper might be partly
+//! * A call to `read_to_end` or `write_all` within the wrapper might be partly
 //!   successful but then error out. These functions will return the error
 //!   without informing the caller of how much was read or written. Wrappers
 //!   with an internal buffer will want to advance their state corresponding
 //!   to the partial success, so they can't use `read_to_end` or `write_all`
 //!   ([example fix][2]).
-//! * Instances cannot propagate `ErrorKind::Interrupted` failures up. Wrappers
-//!   must always retry.
-//! * Instances must propagate `ErrorKind::WouldBlock` failures up, but that
-//!   shouldn't leave them in an invalid state.
+//! * Instances must propagate `Poll::Pending` up, but that shouldn't leave
+//!   them in an invalid state.
 //!
 //! These situations can be hard to think about and hard to test.
 //!
@@ -53,7 +51,7 @@
 //!
 //! 1. For a known bug involving any of these situations, `partial-io` can help
 //!    you write a test.
-//! 2. With the `quickcheck_types` feature enabled, `partial-io` can also help shake
+//! 2. With the `quickcheck09` feature enabled, `partial-io` can also help shake
 //!    out bugs in your wrapper. See [`quickcheck_types`] for more.
 //!
 //! # Examples
@@ -91,26 +89,23 @@
 //! [2]: https://github.com/gyscos/zstd-rs/commit/02dc9d9a3419618fc729542b45c96c32b0f178bb
 //! [tests in `zstd-rs`]: https://github.com/gyscos/zstd-rs/blob/master/src/stream/mod.rs
 
-#[cfg(feature = "tokio")]
+#[cfg(feature = "futures03")]
 mod async_read;
-#[cfg(feature = "tokio")]
+#[cfg(feature = "futures03")]
 mod async_write;
-#[cfg(feature = "quickcheck_types")]
+#[cfg(feature = "futures03")]
+mod futures_util;
+#[cfg(feature = "quickcheck09")]
 pub mod quickcheck_types;
 mod read;
 mod write;
 
 use std::io;
 
-#[cfg(feature = "tokio")]
+#[cfg(feature = "futures03")]
 pub use crate::async_read::PartialAsyncRead;
-#[cfg(feature = "tokio")]
+#[cfg(feature = "futures03")]
 pub use crate::async_write::PartialAsyncWrite;
-#[cfg(feature = "quickcheck_types")]
-pub use crate::quickcheck_types::{
-    GenError, GenInterrupted, GenInterruptedWouldBlock, GenNoErrors, GenWouldBlock,
-    PartialWithErrors,
-};
 pub use crate::read::PartialRead;
 pub use crate::write::PartialWrite;
 
@@ -126,6 +121,10 @@ pub enum PartialOp {
     /// The wrapper will call into the inner `Read` or `Write`
     /// instance. Depending on what the underlying operation does, this may
     /// return an error or a fewer number of bytes.
+    ///
+    /// Some methods like `Write::flush` and `AsyncWrite::poll_flush` don't
+    /// have a limit. For these methods, `Limited(n)` behaves the same as
+    /// `Unlimited`.
     Limited(usize),
 
     /// Do not limit the next IO operation.
@@ -136,6 +135,11 @@ pub enum PartialOp {
     Unlimited,
 
     /// Return an error instead of calling into the underlying operation.
+    ///
+    /// For methods on `Async` traits:
+    /// * `ErrorKind::WouldBlock` is translated to `Poll::Pending` and the task
+    ///   is scheduled to be woken up in the future.
+    /// * `ErrorKind::Interrupted` causes a retry.
     Err(io::ErrorKind),
 }
 

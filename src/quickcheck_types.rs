@@ -25,14 +25,18 @@
 //!
 //! # Examples
 //!
-//! ```rust,ignore
-//! use partial_io::{GenInterrupted, PartialWithErrors};
+//! ```rust
+//! use partial_io::quickcheck_types::{GenInterrupted, PartialWithErrors};
+//! use quickcheck::quickcheck;
 //!
 //! quickcheck! {
-//!     fn test_something(seq: PartialWithErrors<GenInterrupted>) {
-//!         let reader = ...;
+//!     fn test_something(seq: PartialWithErrors<GenInterrupted>) -> bool {
+//!         // Example buffer to read from, substitute with your own.
+//!         let reader = std::io::repeat(42);
 //!         let partial_reader = PartialRead::new(reader, seq);
 //!         // ...
+//!
+//!         true
 //!     }
 //! }
 //! ```

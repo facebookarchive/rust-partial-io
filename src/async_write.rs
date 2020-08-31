@@ -11,57 +11,81 @@
 //! This is separate from `PartialWrite` because on `WouldBlock` errors, it
 //! causes `futures` to try writing or flushing again.
 
-use std::cmp;
+use crate::{futures_util::FuturesOps, PartialOp};
+use futures::{io, prelude::*};
+use pin_project::pin_project;
 use std::fmt;
-use std::io::{self, Read, Write};
-
-use futures::{task, Poll};
-use tokio_io::{AsyncRead, AsyncWrite};
-
-use crate::{make_ops, PartialOp};
+use std::{
+    pin::Pin,
+    task::{Context, Poll},
+};
 
 /// A wrapper that breaks inner `AsyncWrite` instances up according to the
 /// provided iterator.
 ///
-/// Available with the `tokio` feature.
+/// Available with the `futures03` feature for `futures` traits, and with the `tokio02` feature for
+/// `tokio` traits.
 ///
 /// # Examples
 ///
+/// This example uses `tokio`.
+///
 /// ```rust
-/// use std::io::{self, Cursor};
+/// # #[cfg(feature = "tokio02")]
+/// use partial_io::{PartialAsyncWrite, PartialOp};
+/// # #[cfg(feature = "tokio02")]
+/// use std::io::Cursor;
+/// # #[cfg(feature = "tokio02")]
+/// use tokio::prelude::*;
 ///
-/// fn main() {
-///     // Note that this test doesn't demonstrate a limited write because
-///     // tokio-io doesn't have a combinator for that, just write_all.
-///     use tokio_core::reactor::Core;
-///     use tokio_io::io::write_all;
-///
-///     use partial_io::{PartialAsyncWrite, PartialOp};
-///
+/// # #[cfg(feature = "tokio02")]
+/// #[tokio::main]
+/// async fn main() -> io::Result<()> {
 ///     let writer = Cursor::new(Vec::new());
-///     let iter = vec![PartialOp::Err(io::ErrorKind::WouldBlock), PartialOp::Limited(2)];
-///     let partial_writer = PartialAsyncWrite::new(writer, iter);
+///     // Sequential calls to `poll_write()` and the other `poll_` methods simulate the following behavior:
+///     let iter = vec![
+///         PartialOp::Err(io::ErrorKind::WouldBlock),   // A not-ready state.
+///         PartialOp::Limited(2),                       // Only allow 2 bytes to be written.
+///         PartialOp::Err(io::ErrorKind::InvalidData),  // Error from the underlying stream.
+///         PartialOp::Unlimited,                        // Allow as many bytes to be written as possible.
+///     ];
+///     let mut partial_writer = PartialAsyncWrite::new(writer, iter);
 ///     let in_data = vec![1, 2, 3, 4];
 ///
-///     let mut core = Core::new().unwrap();
+///     // This causes poll_write to be called twice, yielding after the first call (WouldBlock).
+///     assert_eq!(partial_writer.write(&in_data).await?, 2);
+///     let cursor_ref = partial_writer.get_ref();
+///     let out = cursor_ref.get_ref();
+///     assert_eq!(&out[..], &[1, 2]);
 ///
-///     let write_fut = write_all(partial_writer, in_data);
+///     // This next call returns an error.
+///     assert_eq!(
+///         partial_writer.write(&in_data[2..]).await.unwrap_err().kind(),
+///         io::ErrorKind::InvalidData,
+///     );
 ///
-///     let (partial_writer, _in_data) = core.run(write_fut).unwrap();
-///     let cursor = partial_writer.into_inner();
-///     let out = cursor.into_inner();
-///     assert_eq!(&out, &[1, 2, 3, 4]);
+///     // And this one causes the last two bytes to be written.
+///     assert_eq!(partial_writer.write(&in_data[2..]).await?, 2);
+///     let cursor_ref = partial_writer.get_ref();
+///     let out = cursor_ref.get_ref();
+///     assert_eq!(&out[..], &[1, 2, 3, 4]);
+///
+///     Ok(())
 /// }
+///
+/// # #[cfg(not(feature = "tokio02"))]
+/// # fn main() {
+/// #     assert!(true, "dummy test");
+/// # }
 /// ```
+#[pin_project]
 pub struct PartialAsyncWrite<W> {
+    #[pin]
     inner: W,
-    ops: Box<dyn Iterator<Item = PartialOp> + Send>,
+    ops: FuturesOps,
 }
 
-impl<W> PartialAsyncWrite<W>
-where
-    W: AsyncWrite,
-{
+impl<W> PartialAsyncWrite<W> {
     /// Creates a new `PartialAsyncWrite` wrapper over the writer with the specified `PartialOp`s.
     pub fn new<I>(inner: W, iter: I) -> Self
     where
@@ -70,23 +94,44 @@ where
     {
         PartialAsyncWrite {
             inner,
-            ops: make_ops(iter),
+            ops: FuturesOps::new(iter),
         }
     }
 
-    /// Sets the `PartialOp`s for this reader.
+    /// Sets the `PartialOp`s for this writer.
     pub fn set_ops<I>(&mut self, iter: I) -> &mut Self
     where
         I: IntoIterator<Item = PartialOp> + 'static,
         I::IntoIter: Send,
     {
-        self.ops = make_ops(iter);
+        self.ops.replace(iter);
         self
     }
 
-    /// Acquires a mutable reference to the underlying writer.
+    /// Sets the `PartialOp`s for this writer in a pinned context.
+    pub fn pin_set_ops<I>(self: Pin<&mut Self>, iter: I) -> Pin<&mut Self>
+    where
+        I: IntoIterator<Item = PartialOp> + 'static,
+        I::IntoIter: Send,
+    {
+        let mut this = self;
+        this.as_mut().project().ops.replace(iter);
+        this
+    }
+
+    /// Returns a shared reference to the underlying writer.
+    pub fn get_ref(&self) -> &W {
+        &self.inner
+    }
+
+    /// Returns a mutable reference to the underlying writer.
     pub fn get_mut(&mut self) -> &mut W {
         &mut self.inner
+    }
+
+    /// Returns a pinned mutable reference to the underlying writer.
+    pub fn pin_get_mut(self: Pin<&mut Self>) -> Pin<&mut W> {
+        self.project().inner
     }
 
     /// Consumes this wrapper, returning the underlying writer.
@@ -95,69 +140,238 @@ where
     }
 }
 
-impl<W> Write for PartialAsyncWrite<W>
-where
-    W: Write,
-{
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        match self.ops.next() {
-            Some(PartialOp::Limited(n)) => {
-                let len = cmp::min(n, buf.len());
-                self.inner.write(&buf[..len])
-            }
-            Some(PartialOp::Err(err)) => {
-                if err == io::ErrorKind::WouldBlock {
-                    // Make sure this task is rechecked.
-                    task::park().unpark();
-                }
-                Err(io::Error::new(
-                    err,
-                    "error during write, generated by partial-io",
-                ))
-            }
-            Some(PartialOp::Unlimited) | None => self.inner.write(buf),
-        }
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        match self.ops.next() {
-            Some(PartialOp::Err(err)) => {
-                if err == io::ErrorKind::WouldBlock {
-                    // Make sure this task is rechecked.
-                    task::park().unpark();
-                }
-                Err(io::Error::new(
-                    err,
-                    "error during flush, generated by partial-io",
-                ))
-            }
-            _ => self.inner.flush(),
-        }
-    }
-}
+// ---
+// Futures impls
+// ---
 
 impl<W> AsyncWrite for PartialAsyncWrite<W>
 where
     W: AsyncWrite,
 {
-    #[inline]
-    fn shutdown(&mut self) -> Poll<(), io::Error> {
-        self.inner.shutdown()
+    fn poll_write(self: Pin<&mut Self>, cx: &mut Context, buf: &[u8]) -> Poll<io::Result<usize>> {
+        let this = self.project();
+        let inner = this.inner;
+
+        this.ops.poll_impl(
+            cx,
+            |cx, len| match len {
+                Some(len) => inner.poll_write(cx, &buf[..len]),
+                None => inner.poll_write(cx, buf),
+            },
+            buf.len(),
+            "error during poll_write, generated by partial-io",
+        )
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        let this = self.project();
+        let inner = this.inner;
+
+        this.ops.poll_impl_no_limit(
+            cx,
+            |cx| inner.poll_flush(cx),
+            "error during poll_flush, generated by partial-io",
+        )
+    }
+
+    fn poll_close(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+        let this = self.project();
+        let inner = this.inner;
+
+        this.ops.poll_impl_no_limit(
+            cx,
+            |cx| inner.poll_close(cx),
+            "error during poll_close, generated by partial-io",
+        )
     }
 }
 
-// Forwarding impls to support duplex structs.
-impl<W> Read for PartialAsyncWrite<W>
+/// This is a forwarding impl to support duplex structs.
+impl<W> AsyncRead for PartialAsyncWrite<W>
 where
-    W: AsyncWrite + Read,
+    W: AsyncRead,
 {
     #[inline]
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        self.inner.read(buf)
+    fn poll_read(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+        buf: &mut [u8],
+    ) -> Poll<io::Result<usize>> {
+        self.project().inner.poll_read(cx, buf)
+    }
+
+    #[inline]
+    fn poll_read_vectored(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+        bufs: &mut [io::IoSliceMut],
+    ) -> Poll<io::Result<usize>> {
+        self.project().inner.poll_read_vectored(cx, bufs)
     }
 }
 
-impl<W> AsyncRead for PartialAsyncWrite<W> where W: AsyncRead + AsyncWrite {}
+/// This is a forwarding impl to support duplex structs.
+impl<W> AsyncBufRead for PartialAsyncWrite<W>
+where
+    W: AsyncBufRead,
+{
+    #[inline]
+    fn poll_fill_buf(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<&[u8]>> {
+        self.project().inner.poll_fill_buf(cx)
+    }
+
+    #[inline]
+    fn consume(self: Pin<&mut Self>, amt: usize) {
+        self.project().inner.consume(amt)
+    }
+}
+
+/// This is a forwarding impl to support duplex structs.
+impl<W> AsyncSeek for PartialAsyncWrite<W>
+where
+    W: AsyncSeek,
+{
+    #[inline]
+    fn poll_seek(
+        self: Pin<&mut Self>,
+        cx: &mut Context,
+        pos: io::SeekFrom,
+    ) -> Poll<io::Result<u64>> {
+        self.project().inner.poll_seek(cx, pos)
+    }
+}
+
+// ---
+// Tokio impls
+// ---
+
+#[cfg(feature = "tokio02")]
+mod tokio_impl {
+    use super::PartialAsyncWrite;
+    use bytes::BufMut;
+    use std::{
+        io::SeekFrom,
+        mem::MaybeUninit,
+        pin::Pin,
+        task::{Context, Poll},
+    };
+    use tokio::io::AsyncSeek;
+    use tokio::prelude::*;
+
+    impl<W> AsyncWrite for PartialAsyncWrite<W>
+    where
+        W: AsyncWrite,
+    {
+        fn poll_write(
+            self: Pin<&mut Self>,
+            cx: &mut Context,
+            buf: &[u8],
+        ) -> Poll<io::Result<usize>> {
+            let this = self.project();
+            let inner = this.inner;
+
+            this.ops.poll_impl(
+                cx,
+                |cx, len| match len {
+                    Some(len) => inner.poll_write(cx, &buf[..len]),
+                    None => inner.poll_write(cx, buf),
+                },
+                buf.len(),
+                "error during poll_write, generated by partial-io",
+            )
+        }
+
+        fn poll_flush(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+            let this = self.project();
+            let inner = this.inner;
+
+            this.ops.poll_impl_no_limit(
+                cx,
+                |cx| inner.poll_flush(cx),
+                "error during poll_flush, generated by partial-io",
+            )
+        }
+
+        fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<()>> {
+            let this = self.project();
+            let inner = this.inner;
+
+            this.ops.poll_impl_no_limit(
+                cx,
+                |cx| inner.poll_shutdown(cx),
+                "error during poll_shutdown, generated by partial-io",
+            )
+        }
+    }
+
+    /// This is a forwarding impl to support duplex structs.
+    impl<W> AsyncRead for PartialAsyncWrite<W>
+    where
+        W: AsyncRead,
+    {
+        #[inline]
+        fn poll_read(
+            self: Pin<&mut Self>,
+            cx: &mut Context,
+            buf: &mut [u8],
+        ) -> Poll<io::Result<usize>> {
+            self.project().inner.poll_read(cx, buf)
+        }
+
+        #[inline]
+        unsafe fn prepare_uninitialized_buffer(&self, buf: &mut [MaybeUninit<u8>]) -> bool {
+            self.inner.prepare_uninitialized_buffer(buf)
+        }
+
+        #[inline]
+        fn poll_read_buf<B: BufMut>(
+            self: Pin<&mut Self>,
+            cx: &mut Context,
+            buf: &mut B,
+        ) -> Poll<io::Result<usize>>
+        where
+            Self: Sized,
+        {
+            self.project().inner.poll_read_buf(cx, buf)
+        }
+    }
+
+    /// This is a forwarding impl to support duplex structs.
+    impl<W> AsyncBufRead for PartialAsyncWrite<W>
+    where
+        W: AsyncBufRead,
+    {
+        #[inline]
+        fn poll_fill_buf(self: Pin<&mut Self>, cx: &mut Context) -> Poll<io::Result<&[u8]>> {
+            self.project().inner.poll_fill_buf(cx)
+        }
+
+        #[inline]
+        fn consume(self: Pin<&mut Self>, amt: usize) {
+            self.project().inner.consume(amt)
+        }
+    }
+
+    /// This is a forwarding impl to support duplex structs.
+    impl<W> AsyncSeek for PartialAsyncWrite<W>
+    where
+        W: AsyncSeek,
+    {
+        #[inline]
+        fn start_seek(
+            self: Pin<&mut Self>,
+            cx: &mut Context<'_>,
+            position: SeekFrom,
+        ) -> Poll<io::Result<()>> {
+            self.project().inner.start_seek(cx, position)
+        }
+
+        #[inline]
+        fn poll_complete(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<u64>> {
+            self.project().inner.poll_complete(cx)
+        }
+    }
+}
 
 impl<W> fmt::Debug for PartialAsyncWrite<W>
 where

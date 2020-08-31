@@ -105,7 +105,10 @@ mod test {
     use lazy_static::lazy_static;
     use quickcheck::{quickcheck, TestResult};
 
-    use partial_io::{GenInterrupted, PartialOp, PartialWithErrors, PartialWrite};
+    use partial_io::{
+        quickcheck_types::{GenInterrupted, PartialWithErrors},
+        PartialOp, PartialWrite,
+    };
 
     use super::*;
 
