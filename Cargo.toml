@@ -19,26 +19,29 @@ exclude = [
 ]
 
 [dependencies]
-futures = { version = "0.1", optional = true }
+futures = { version = "0.3", optional = true }
 quickcheck = { version = "0.9", optional = true }
 rand = { version = "0.7", optional = true }
-tokio-io = { version = "0.1", optional = true }
+bytes = { version = "0.5.6", optional = true }
+pin-project = { version = "0.4.23", optional = true }
+tokio = { version = "0.2", optional = true, features = ["io-util", "rt-core"] }
 
 [dev-dependencies]
 lazy_static = "1"
 quickcheck = "0.9"
-tokio-core = "0.1"
+tokio = { version = "0.2", features = ["io-util", "macros", "rt-core", "rt-threaded"] }
 
 [[example]]
 name = "buggy_write"
-required-features = ["quickcheck"]
+required-features = ["quickcheck09"]
 
 [features]
-tokio = ["tokio-io", "futures"]
-quickcheck_types = ["quickcheck", "rand"]
+futures03 = ["futures", "pin-project"]
+tokio02 = ["futures03", "tokio", "bytes"]
+quickcheck09 = ["quickcheck", "rand"]
 
 [badges]
 travis-ci = { repository = "facebookincubator/rust-partial-io" }
 
 [package.metadata.docs.rs]
-features = ["tokio", "quickcheck"]
+all-features = true
