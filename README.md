@@ -1,14 +1,56 @@
-# partial-io [![Build Status](https://travis-ci.org/facebookincubator/rust-partial-io.svg?branch=master)](https://travis-ci.org/facebookincubator/rust-partial-io) [![crates.io](https://img.shields.io/crates/v/partial-io.svg)](https://crates.io/crates/partial-io)
+# partial-io
 
-A Rust utility library to test resilience of `Read` or `Write` wrappers.
+[![partial-io on crates.io](https://img.shields.io/crates/v/partial-io)](https://crates.io/crates/partial-io)
+[![Documentation (latest release)](https://docs.rs/partial-io/badge.svg)](https://docs.rs/partial-io/)
+[![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/partial-io/rustdoc/partial_io/)
+[![License](https://img.shields.io/badge/license-Apache-green.svg)](../LICENSE-APACHE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE-MIT)
 
-If you'd like to help out, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Helpers for testing I/O behavior with partial, interrupted and blocking reads and writes.
 
-[Documentation (latest release)](https://docs.rs/partial-io)
+This library provides:
 
-[Documentation (master)](https://facebookincubator.github.io/rust-partial-io)
+* `PartialRead` and `PartialWrite`, which wrap existing `Read` and
+  `Write` implementations and allow specifying arbitrary behavior on the
+  next `read`, `write` or `flush` call.
+* With the optional `futures03` and `tokio02` features, `PartialAsyncRead` and
+  `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`
+  implementations. These implementations are task-aware, so they will know
+  how to pause and unpause tasks if they return a `WouldBlock` error.
+* With the optional `quickcheck09` feature, generation of random sequences of
+  operations which can be provided to one of the wrappers. See the
+  `quickcheck_types` documentation for more.
 
-## Example
+## Motivation
+
+A `Read` or `Write` wrapper is conceptually simple but can be difficult to
+get right, especially if the wrapper has an internal buffer. Common
+issues include:
+
+* A partial read or write, even without an error, might leave the wrapper
+  in an invalid state ([example fix][1]).
+
+With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio02`:
+
+* A call to `read_to_end` or `write_all` within the wrapper might be partly
+  successful but then error out. These functions will return the error
+  without informing the caller of how much was read or written. Wrappers
+  with an internal buffer will want to advance their state corresponding
+  to the partial success, so they can't use `read_to_end` or `write_all`
+  ([example fix][2]).
+* Instances must propagate `Poll::Pending` up, but that shouldn't leave
+  them in an invalid state.
+
+These situations can be hard to think about and hard to test.
+
+`partial-io` can help in two ways:
+
+1. For a known bug involving any of these situations, `partial-io` can help
+   you write a test.
+2. With the `quickcheck09` feature enabled, `partial-io` can also help shake
+   out bugs in your wrapper. See `quickcheck_types` for more.
+
+## Examples
 
 ```rust
 use std::io::{self, Cursor, Read};
@@ -32,42 +74,24 @@ assert_eq!(partial_read.read(&mut out[7..]).unwrap(), 6);
 assert_eq!(&out[..13], b"Hello, world!");
 ```
 
-## Quick start
+For a real-world example, see the [tests in `zstd-rs`].
 
-Add this to your `Cargo.toml`:
+[1]: https://github.com/gyscos/zstd-rs/commit/3123e418595f6badd5b06db2a14c4ff4555e7705
+[2]: https://github.com/gyscos/zstd-rs/commit/02dc9d9a3419618fc729542b45c96c32b0f178bb
+[tests in `zstd-rs`]: https://github.com/gyscos/zstd-rs/blob/master/src/stream/mod.rs
 
-```toml
-[dev-dependencies]
-partial-io = "0.3"
-```
+## Contributing
 
-Now you can use `partial-io` in your tests.
-
-## Tokio integration
-
-`partial-io` can optionally integrate with the `tokio-io` library to provide
-wrappers for `AsyncRead` and `AsyncWrite` instances. Enable the `tokio` feature
-to use this:
-
-```toml
-[dev-dependencies]
-partial-io = { version = "0.3", features = ["tokio"] }
-```
-
-## QuickCheck integration
-
-`partial-io` can optionally integrate with the `quickcheck` library to generate
-random test cases. Enable the `quickcheck` feature to use this:
-
-```toml
-[dev-dependencies]
-partial-io = { version = "0.3", features = ["quickcheck"] }
-```
-
-See the
-[documentation](https://facebookincubator.github.io/rust-partial-io/partial_io/quickcheck_types/index.html)
-for how to use `quickcheck` to generate tests.
+See the [CONTRIBUTING](../CONTRIBUTING.md) file for how to help out.
 
 ## License
 
-`partial-io` is MIT-licensed.
+This project is available under the terms of either the [Apache 2.0 license](../LICENSE-APACHE) or the [MIT
+license](../LICENSE-MIT).
+
+<!--
+README.md is generated from README.tpl by cargo readme. To regenerate:
+
+cargo install cargo-readme
+cargo readme > README.md
+-->
