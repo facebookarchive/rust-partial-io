@@ -1,7 +1,8 @@
 on:
   push:
     branches:
-      - trunk
+      # TODO: update to "trunk" or similar
+      - master
 
 name: Docs
 
