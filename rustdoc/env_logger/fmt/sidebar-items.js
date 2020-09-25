@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Target","Log target, either `stdout` or `stderr`."],["TimestampPrecision","Formatting precision of timestamps."],["WriteStyle","Whether or not to print styles to the target."]],"struct":[["Formatter","A formatter to write logs into."]]});

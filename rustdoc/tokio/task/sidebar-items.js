@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["spawn","Spawns a new asynchronous task, returning a `JoinHandle` for it."],["yield_now","Yields execution back to the Tokio runtime."]],"struct":[["JoinError","Task failed to execute to completion."],["JoinHandle","An owned permission to join on a task (await its termination)."]]});
