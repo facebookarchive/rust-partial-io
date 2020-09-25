@@ -14,16 +14,16 @@
 //!
 //! This library provides:
 //!
-//! * [`PartialRead`] and [`PartialWrite`], which wrap existing `Read` and
+//! * `PartialRead` and `PartialWrite`, which wrap existing `Read` and
 //!   `Write` implementations and allow specifying arbitrary behavior on the
 //!   next `read`, `write` or `flush` call.
-//! * With the optional `tokio` feature, [`PartialAsyncRead`] and
-//!   [`PartialAsyncWrite`] to wrap existing `AsyncRead` and `AsyncWrite`
+//! * With the optional `futures03` and `tokio02` features, `PartialAsyncRead` and
+//!   `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`
 //!   implementations. These implementations are task-aware, so they will know
 //!   how to pause and unpause tasks if they return a `WouldBlock` error.
 //! * With the optional `quickcheck09` feature, generation of random sequences of
 //!   operations which can be provided to one of the wrappers. See the
-//!   [`quickcheck_types` documentation](quickcheck_types/index.html) for more.
+//!   `quickcheck_types` documentation for more.
 //!
 //! # Motivation
 //!
@@ -34,7 +34,7 @@
 //! * A partial read or write, even without an error, might leave the wrapper
 //!   in an invalid state ([example fix][1]).
 //!
-//! With the `AsyncRead` and `AsyncWrite` provided by `futures` and `tokio`:
+//! With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio02`:
 //!
 //! * A call to `read_to_end` or `write_all` within the wrapper might be partly
 //!   successful but then error out. These functions will return the error
@@ -52,7 +52,7 @@
 //! 1. For a known bug involving any of these situations, `partial-io` can help
 //!    you write a test.
 //! 2. With the `quickcheck09` feature enabled, `partial-io` can also help shake
-//!    out bugs in your wrapper. See [`quickcheck_types`] for more.
+//!    out bugs in your wrapper. See `quickcheck_types` for more.
 //!
 //! # Examples
 //!
@@ -80,11 +80,6 @@
 //!
 //! For a real-world example, see the [tests in `zstd-rs`].
 //!
-//! [`PartialRead`]: struct.PartialRead.html
-//! [`PartialWrite`]: struct.PartialWrite.html
-//! [`PartialAsyncRead`]: struct.PartialAsyncRead.html
-//! [`PartialAsyncWrite`]: struct.PartialAsyncWrite.html
-//! [`quickcheck_types`]: quickcheck_types/index.html
 //! [1]: https://github.com/gyscos/zstd-rs/commit/3123e418595f6badd5b06db2a14c4ff4555e7705
 //! [2]: https://github.com/gyscos/zstd-rs/commit/02dc9d9a3419618fc729542b45c96c32b0f178bb
 //! [tests in `zstd-rs`]: https://github.com/gyscos/zstd-rs/blob/master/src/stream/mod.rs
