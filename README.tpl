@@ -2,9 +2,8 @@
 
 [![partial-io on crates.io](https://img.shields.io/crates/v/partial-io)](https://crates.io/crates/partial-io)
 [![Documentation (latest release)](https://docs.rs/partial-io/badge.svg)](https://docs.rs/partial-io/)
-[![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/partial-io/rustdoc/partial_io/)
-[![License](https://img.shields.io/badge/license-Apache-green.svg)](../LICENSE-APACHE)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE-MIT)
+[![Documentation (master)](https://img.shields.io/badge/docs-master-brightgreen)](https://facebookincubator.github.io/rust-partial-io/rustdoc/partial_io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 {{readme}}
 
