@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Updated to tokio 1.0.
+
 ## [0.4.0] - 2020-09-24
 ### Changed
 - Updated to quickcheck 0.9, tokio 0.2 and futures 0.3.
