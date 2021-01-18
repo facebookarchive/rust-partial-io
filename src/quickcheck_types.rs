@@ -55,11 +55,8 @@
 
 use crate::PartialOp;
 use quickcheck::{empty_shrinker, Arbitrary, Gen};
-use rand::rngs::SmallRng;
-use rand::{Rng, SeedableRng};
-use std::io;
-use std::marker::PhantomData;
-use std::ops::Deref;
+use rand::{rngs::SmallRng, Rng, SeedableRng};
+use std::{io, marker::PhantomData, ops::Deref};
 
 /// Given a custom error generator, randomly generate a list of `PartialOp`s.
 #[derive(Clone, Debug)]

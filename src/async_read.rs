@@ -236,8 +236,7 @@ mod tokio_impl {
         pin::Pin,
         task::{Context, Poll},
     };
-    use tokio::io::AsyncSeek;
-    use tokio::prelude::*;
+    use tokio::{io::AsyncSeek, prelude::*};
 
     impl<R> AsyncRead for PartialAsyncRead<R>
     where
