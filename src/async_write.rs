@@ -23,7 +23,7 @@ use std::{
 /// A wrapper that breaks inner `AsyncWrite` instances up according to the
 /// provided iterator.
 ///
-/// Available with the `futures03` feature for `futures` traits, and with the `tokio02` feature for
+/// Available with the `futures03` feature for `futures` traits, and with the `tokio1` feature for
 /// `tokio` traits.
 ///
 /// # Examples
@@ -31,14 +31,14 @@ use std::{
 /// This example uses `tokio`.
 ///
 /// ```rust
-/// # #[cfg(feature = "tokio02")]
+/// # #[cfg(feature = "tokio1")]
 /// use partial_io::{PartialAsyncWrite, PartialOp};
-/// # #[cfg(feature = "tokio02")]
-/// use std::io::Cursor;
-/// # #[cfg(feature = "tokio02")]
-/// use tokio::prelude::*;
+/// # #[cfg(feature = "tokio1")]
+/// use std::io::{self, Cursor};
+/// # #[cfg(feature = "tokio1")]
+/// use tokio::io::AsyncWriteExt;
 ///
-/// # #[cfg(feature = "tokio02")]
+/// # #[cfg(feature = "tokio1")]
 /// #[tokio::main]
 /// async fn main() -> io::Result<()> {
 ///     let writer = Cursor::new(Vec::new());
@@ -73,7 +73,7 @@ use std::{
 ///     Ok(())
 /// }
 ///
-/// # #[cfg(not(feature = "tokio02"))]
+/// # #[cfg(not(feature = "tokio1"))]
 /// # fn main() {
 /// #     assert!(true, "dummy test");
 /// # }
@@ -245,17 +245,15 @@ where
 // Tokio impls
 // ---
 
-#[cfg(feature = "tokio02")]
+#[cfg(feature = "tokio1")]
 mod tokio_impl {
     use super::PartialAsyncWrite;
-    use bytes::BufMut;
     use std::{
-        io::SeekFrom,
-        mem::MaybeUninit,
+        io::{self, SeekFrom},
         pin::Pin,
         task::{Context, Poll},
     };
-    use tokio::{io::AsyncSeek, prelude::*};
+    use tokio::io::{AsyncBufRead, AsyncRead, AsyncSeek, AsyncWrite, ReadBuf};
 
     impl<W> AsyncWrite for PartialAsyncWrite<W>
     where
@@ -312,26 +310,9 @@ mod tokio_impl {
         fn poll_read(
             self: Pin<&mut Self>,
             cx: &mut Context,
-            buf: &mut [u8],
-        ) -> Poll<io::Result<usize>> {
+            buf: &mut ReadBuf<'_>,
+        ) -> Poll<io::Result<()>> {
             self.project().inner.poll_read(cx, buf)
-        }
-
-        #[inline]
-        unsafe fn prepare_uninitialized_buffer(&self, buf: &mut [MaybeUninit<u8>]) -> bool {
-            self.inner.prepare_uninitialized_buffer(buf)
-        }
-
-        #[inline]
-        fn poll_read_buf<B: BufMut>(
-            self: Pin<&mut Self>,
-            cx: &mut Context,
-            buf: &mut B,
-        ) -> Poll<io::Result<usize>>
-        where
-            Self: Sized,
-        {
-            self.project().inner.poll_read_buf(cx, buf)
         }
     }
 
@@ -357,12 +338,8 @@ mod tokio_impl {
         W: AsyncSeek,
     {
         #[inline]
-        fn start_seek(
-            self: Pin<&mut Self>,
-            cx: &mut Context<'_>,
-            position: SeekFrom,
-        ) -> Poll<io::Result<()>> {
-            self.project().inner.start_seek(cx, position)
+        fn start_seek(self: Pin<&mut Self>, position: SeekFrom) -> io::Result<()> {
+            self.project().inner.start_seek(position)
         }
 
         #[inline]

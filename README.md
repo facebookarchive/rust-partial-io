@@ -12,7 +12,7 @@ This library provides:
 * `PartialRead` and `PartialWrite`, which wrap existing `Read` and
   `Write` implementations and allow specifying arbitrary behavior on the
   next `read`, `write` or `flush` call.
-* With the optional `futures03` and `tokio02` features, `PartialAsyncRead` and
+* With the optional `futures03` and `tokio1` features, `PartialAsyncRead` and
   `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`
   implementations. These implementations are task-aware, so they will know
   how to pause and unpause tasks if they return a `WouldBlock` error.
@@ -29,7 +29,7 @@ issues include:
 * A partial read or write, even without an error, might leave the wrapper
   in an invalid state ([example fix][1]).
 
-With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio02`:
+With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio1`:
 
 * A call to `read_to_end` or `write_all` within the wrapper might be partly
   successful but then error out. These functions will return the error
