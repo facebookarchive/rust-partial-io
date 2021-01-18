@@ -101,8 +101,7 @@ use std::io;
 pub use crate::async_read::PartialAsyncRead;
 #[cfg(feature = "futures03")]
 pub use crate::async_write::PartialAsyncWrite;
-pub use crate::read::PartialRead;
-pub use crate::write::PartialWrite;
+pub use crate::{read::PartialRead, write::PartialWrite};
 
 /// What to do the next time an IO operation is performed.
 ///

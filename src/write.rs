@@ -8,9 +8,10 @@
 //! This module contains a writer wrapper that breaks writes up according to a
 //! provided iterator.
 
-use std::cmp;
-use std::fmt;
-use std::io::{self, Read, Write};
+use std::{
+    cmp, fmt,
+    io::{self, Read, Write},
+};
 
 use crate::{make_ops, PartialOp};
 

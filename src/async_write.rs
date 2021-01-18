@@ -14,8 +14,8 @@
 use crate::{futures_util::FuturesOps, PartialOp};
 use futures::{io, prelude::*};
 use pin_project::pin_project;
-use std::fmt;
 use std::{
+    fmt,
     pin::Pin,
     task::{Context, Poll},
 };
@@ -255,8 +255,7 @@ mod tokio_impl {
         pin::Pin,
         task::{Context, Poll},
     };
-    use tokio::io::AsyncSeek;
-    use tokio::prelude::*;
+    use tokio::{io::AsyncSeek, prelude::*};
 
     impl<W> AsyncWrite for PartialAsyncWrite<W>
     where
