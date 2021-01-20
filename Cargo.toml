@@ -24,12 +24,12 @@ quickcheck = { version = "0.9", optional = true }
 rand = { version = "0.7", optional = true }
 bytes = { version = "0.5.6", optional = true }
 pin-project = { version = "0.4.23", optional = true }
-tokio = { version = "0.2", optional = true, features = ["io-util", "rt-core"] }
+tokio = { version = "1.0", optional = true, features = ["io-util", "rt-core"] }
 
 [dev-dependencies]
 lazy_static = "1"
 quickcheck = "0.9"
-tokio = { version = "0.2", features = ["io-util", "macros", "rt-core", "rt-threaded"] }
+tokio = { version = "1.0", features = ["io-util", "macros", "rt-core", "rt-threaded"] }
 
 [[example]]
 name = "buggy_write"
