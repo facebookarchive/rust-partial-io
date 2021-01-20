@@ -21,7 +21,7 @@
 //!   `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`
 //!   implementations. These implementations are task-aware, so they will know
 //!   how to pause and unpause tasks if they return a `WouldBlock` error.
-//! * With the optional `quickcheck09` feature, generation of random sequences of
+//! * With the optional `quickcheck1` feature, generation of random sequences of
 //!   operations which can be provided to one of the wrappers. See the
 //!   `quickcheck_types` documentation for more.
 //!
@@ -51,7 +51,7 @@
 //!
 //! 1. For a known bug involving any of these situations, `partial-io` can help
 //!    you write a test.
-//! 2. With the `quickcheck09` feature enabled, `partial-io` can also help shake
+//! 2. With the `quickcheck1` feature enabled, `partial-io` can also help shake
 //!    out bugs in your wrapper. See `quickcheck_types` for more.
 //!
 //! # Examples
@@ -90,7 +90,7 @@ mod async_read;
 mod async_write;
 #[cfg(feature = "futures03")]
 mod futures_util;
-#[cfg(feature = "quickcheck09")]
+#[cfg(feature = "quickcheck1")]
 pub mod quickcheck_types;
 mod read;
 mod write;
