@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-1.3.9/src/dfa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfa.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../regex/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-1.4.3/src/dfa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dfa.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../regex/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2555,7 +2558,7 @@ implementation.)
             <span class="comment">// to make sure that `prev_si` always represents the previous state</span>
             <span class="comment">// and `next_si` always represents the next state after the loop</span>
             <span class="comment">// exits, even if it isn&#39;t always true inside the loop.</span>
-            <span class="kw">while</span> <span class="ident">next_si</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() {
+            <span class="kw">while</span> <span class="ident">next_si</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="op">&amp;&amp;</span> <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() {
                 <span class="comment">// Argument for safety is in the definition of next_si.</span>
                 <span class="ident">prev_si</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">next_si</span>(<span class="ident">next_si</span>, <span class="ident">text</span>, <span class="ident">at</span>) };
                 <span class="ident">at</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -2582,7 +2585,7 @@ implementation.)
                 <span class="comment">// special case analysis. In particular, we need to record the</span>
                 <span class="comment">// last position as having matched and possibly quit the DFA if</span>
                 <span class="comment">// we don&#39;t need to keep matching.</span>
-                <span class="ident">next_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+                <span class="ident">next_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
                 <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>);
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">quit_after_match</span> {
                     <span class="kw">return</span> <span class="ident">result</span>;
@@ -2609,7 +2612,7 @@ implementation.)
                 <span class="comment">// we&#39;ve left this particular state.</span>
                 <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">at</span>;
                 <span class="kw">while</span> (<span class="ident">next_si</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">prev_si</span>
-                    <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">at</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>()
+                    <span class="op">&amp;&amp;</span> <span class="ident">at</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>()
                 {
                     <span class="comment">// Argument for safety is in the definition of next_si.</span>
                     <span class="ident">next_si</span> <span class="op">=</span> <span class="kw">unsafe</span> {
@@ -2622,11 +2625,11 @@ implementation.)
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">next_si</span> <span class="op">&amp;</span> <span class="ident">STATE_START</span> <span class="op">&gt;</span> <span class="number">0</span> {
                 <span class="comment">// A start state isn&#39;t in the common case because we may</span>
-                <span class="comment">// what to do quick prefix scanning. If the program doesn&#39;t</span>
+                <span class="comment">// want to do quick prefix scanning. If the program doesn&#39;t</span>
                 <span class="comment">// have a detected prefix, then start states are actually</span>
                 <span class="comment">// considered common and this case is never reached.</span>
                 <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">has_prefix</span>());
-                <span class="ident">next_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_START</span>;
+                <span class="ident">next_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_START</span>;
                 <span class="ident">prev_si</span> <span class="op">=</span> <span class="ident">next_si</span>;
                 <span class="ident">at</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">prefix_at</span>(<span class="ident">text</span>, <span class="ident">at</span>) {
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-ty">Result</span>::<span class="ident">NoMatch</span>(<span class="ident">text</span>.<span class="ident">len</span>()),
@@ -2643,7 +2646,7 @@ implementation.)
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>]);
                 <span class="comment">// We no longer care about the special bits in the state</span>
                 <span class="comment">// pointer.</span>
-                <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="ident">STATE_MAX</span>;
+                <span class="ident">prev_si</span> <span class="op">&amp;=</span> <span class="ident">STATE_MAX</span>;
                 <span class="comment">// Record where we are. This is used to track progress for</span>
                 <span class="comment">// determining whether we should quit if we&#39;ve flushed the</span>
                 <span class="comment">// cache too much.</span>
@@ -2655,7 +2658,7 @@ implementation.)
                 };
                 <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">next_si</span> <span class="op">!</span><span class="op">=</span> <span class="ident">STATE_UNKNOWN</span>);
                 <span class="kw">if</span> <span class="ident">next_si</span> <span class="op">&amp;</span> <span class="ident">STATE_MATCH</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">next_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+                    <span class="ident">next_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
                     <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>);
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">quit_after_match</span> {
                         <span class="kw">return</span> <span class="ident">result</span>;
@@ -2668,10 +2671,10 @@ implementation.)
             }
         }
 
-        <span class="comment">// Run the DFA once more on the special EOF senitnel value.</span>
+        <span class="comment">// Run the DFA once more on the special EOF sentinel value.</span>
         <span class="comment">// We don&#39;t care about the special bits in the state pointer any more,</span>
         <span class="comment">// so get rid of them.</span>
-        <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="ident">STATE_MAX</span>;
+        <span class="ident">prev_si</span> <span class="op">&amp;=</span> <span class="ident">STATE_MAX</span>;
         <span class="ident">prev_si</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next_state</span>(<span class="ident">qcur</span>, <span class="ident">qnext</span>, <span class="ident">prev_si</span>, <span class="ident">Byte</span>::<span class="ident">eof</span>()) {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-ty">Result</span>::<span class="ident">Quit</span>,
             <span class="prelude-val">Some</span>(<span class="ident">STATE_DEAD</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">result</span>.<span class="ident">set_non_match</span>(<span class="ident">text</span>.<span class="ident">len</span>()),
@@ -2679,7 +2682,7 @@ implementation.)
         };
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">prev_si</span> <span class="op">!</span><span class="op">=</span> <span class="ident">STATE_UNKNOWN</span>);
         <span class="kw">if</span> <span class="ident">prev_si</span> <span class="op">&amp;</span> <span class="ident">STATE_MATCH</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+            <span class="ident">prev_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
             <span class="self">self</span>.<span class="ident">last_match_si</span> <span class="op">=</span> <span class="ident">prev_si</span>;
             <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="ident">text</span>.<span class="ident">len</span>());
         }
@@ -2705,7 +2708,7 @@ implementation.)
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">prev_si</span>, <span class="kw-2">mut</span> <span class="ident">next_si</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">start</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">at</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">at</span>;
         <span class="kw">while</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">while</span> <span class="ident">next_si</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">while</span> <span class="ident">next_si</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="op">&amp;&amp;</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> {
                 <span class="comment">// Argument for safety is in the definition of next_si.</span>
                 <span class="ident">at</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">prev_si</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">next_si</span>(<span class="ident">next_si</span>, <span class="ident">text</span>, <span class="ident">at</span>) };
@@ -2728,7 +2731,7 @@ implementation.)
                 <span class="ident">next_si</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">next_si</span>(<span class="ident">prev_si</span>, <span class="ident">text</span>, <span class="ident">at</span>) };
             }
             <span class="kw">if</span> <span class="ident">next_si</span> <span class="op">&amp;</span> <span class="ident">STATE_MATCH</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">next_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+                <span class="ident">next_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
                 <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="ident">at</span> <span class="op">+</span> <span class="number">1</span>);
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">quit_after_match</span> {
                     <span class="kw">return</span> <span class="ident">result</span>;
@@ -2736,7 +2739,7 @@ implementation.)
                 <span class="self">self</span>.<span class="ident">last_match_si</span> <span class="op">=</span> <span class="ident">next_si</span>;
                 <span class="ident">prev_si</span> <span class="op">=</span> <span class="ident">next_si</span>;
                 <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">at</span>;
-                <span class="kw">while</span> (<span class="ident">next_si</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">at</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
+                <span class="kw">while</span> (<span class="ident">next_si</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">prev_si</span> <span class="op">&amp;&amp;</span> <span class="ident">at</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
                     <span class="comment">// Argument for safety is in the definition of next_si.</span>
                     <span class="ident">at</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">next_si</span> <span class="op">=</span> <span class="kw">unsafe</span> {
@@ -2751,7 +2754,7 @@ implementation.)
                     <span class="kw">return</span> <span class="prelude-ty">Result</span>::<span class="ident">Quit</span>;
                 }
                 <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span>]);
-                <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="ident">STATE_MAX</span>;
+                <span class="ident">prev_si</span> <span class="op">&amp;=</span> <span class="ident">STATE_MAX</span>;
                 <span class="self">self</span>.<span class="ident">at</span> <span class="op">=</span> <span class="ident">at</span>;
                 <span class="ident">next_si</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next_state</span>(<span class="ident">qcur</span>, <span class="ident">qnext</span>, <span class="ident">prev_si</span>, <span class="ident">byte</span>) {
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-ty">Result</span>::<span class="ident">Quit</span>,
@@ -2760,7 +2763,7 @@ implementation.)
                 };
                 <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">next_si</span> <span class="op">!</span><span class="op">=</span> <span class="ident">STATE_UNKNOWN</span>);
                 <span class="kw">if</span> <span class="ident">next_si</span> <span class="op">&amp;</span> <span class="ident">STATE_MATCH</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">next_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+                    <span class="ident">next_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
                     <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="ident">at</span> <span class="op">+</span> <span class="number">1</span>);
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">quit_after_match</span> {
                         <span class="kw">return</span> <span class="ident">result</span>;
@@ -2773,7 +2776,7 @@ implementation.)
             }
         }
 
-        <span class="comment">// Run the DFA once more on the special EOF senitnel value.</span>
+        <span class="comment">// Run the DFA once more on the special EOF sentinel value.</span>
         <span class="ident">prev_si</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next_state</span>(<span class="ident">qcur</span>, <span class="ident">qnext</span>, <span class="ident">prev_si</span>, <span class="ident">Byte</span>::<span class="ident">eof</span>()) {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-ty">Result</span>::<span class="ident">Quit</span>,
             <span class="prelude-val">Some</span>(<span class="ident">STATE_DEAD</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">result</span>.<span class="ident">set_non_match</span>(<span class="number">0</span>),
@@ -2781,7 +2784,7 @@ implementation.)
         };
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">prev_si</span> <span class="op">!</span><span class="op">=</span> <span class="ident">STATE_UNKNOWN</span>);
         <span class="kw">if</span> <span class="ident">prev_si</span> <span class="op">&amp;</span> <span class="ident">STATE_MATCH</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">prev_si</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
+            <span class="ident">prev_si</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">STATE_MATCH</span>;
             <span class="self">self</span>.<span class="ident">last_match_si</span> <span class="op">=</span> <span class="ident">prev_si</span>;
             <span class="ident">result</span> <span class="op">=</span> <span class="prelude-ty">Result</span>::<span class="ident">Match</span>(<span class="number">0</span>);
         }
@@ -2856,8 +2859,8 @@ implementation.)
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">si</span>).<span class="ident">flags</span>().<span class="ident">has_empty</span>() {
             <span class="comment">// Compute the flags immediately preceding the current byte.</span>
             <span class="comment">// This means we only care about the &quot;end&quot; or &quot;end line&quot; flags.</span>
-            <span class="comment">// (The &quot;start&quot; flags are computed immediately proceding the</span>
-            <span class="comment">// current byte and is handled below.)</span>
+            <span class="comment">// (The &quot;start&quot; flags are computed immediately following the</span>
+            <span class="comment">// current byte and are handled below.)</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">EmptyFlags</span>::<span class="ident">default</span>();
             <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_eof</span>() {
                 <span class="ident">flags</span>.<span class="ident">end</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -2909,7 +2912,7 @@ implementation.)
                     <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">continue_past_first_match</span>() {
                         <span class="kw">break</span>;
                     } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">matches</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span>
-                        <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="ident">qnext</span>.<span class="ident">contains</span>(<span class="ident">ip</span> <span class="kw">as</span> <span class="ident">usize</span>)
+                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">qnext</span>.<span class="ident">contains</span>(<span class="ident">ip</span> <span class="kw">as</span> <span class="ident">usize</span>)
                     {
                         <span class="comment">// If we are continuing on to find other matches,</span>
                         <span class="comment">// then keep a record of the match states we&#39;ve seen.</span>
@@ -2928,7 +2931,7 @@ implementation.)
             }
         }
 
-        <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_eof</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">matches</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
+        <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_eof</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">matches</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
             <span class="comment">// If we&#39;re processing the last byte of the input and we&#39;re</span>
             <span class="comment">// matching a regex set, then make the next state contain the</span>
             <span class="comment">// previous states transitions. We do this so that the main</span>
@@ -2958,7 +2961,7 @@ implementation.)
             <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>(<span class="ident">next</span>).<span class="ident">flags</span>().<span class="ident">is_match</span>());
             <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start_ptr</span>(<span class="ident">next</span>);
         }
-        <span class="kw">if</span> <span class="ident">next</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">next</span>).<span class="ident">flags</span>().<span class="ident">is_match</span>() {
+        <span class="kw">if</span> <span class="ident">next</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">STATE_MAX</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">next</span>).<span class="ident">flags</span>().<span class="ident">is_match</span>() {
             <span class="ident">next</span> <span class="op">|</span><span class="op">=</span> <span class="ident">STATE_MATCH</span>;
         }
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">next</span> <span class="op">!</span><span class="op">=</span> <span class="ident">STATE_UNKNOWN</span>);
@@ -2991,7 +2994,7 @@ implementation.)
     <span class="doccomment">///</span>
     <span class="doccomment">/// If matching starts after the beginning of the input, then only start</span>
     <span class="doccomment">/// line should be set if the preceding byte is `\n`. End line should never</span>
-    <span class="doccomment">/// be set in this case. (Even if the proceding byte is a `\n`, it will</span>
+    <span class="doccomment">/// be set in this case. (Even if the following byte is a `\n`, it will</span>
     <span class="doccomment">/// be handled in a subsequent DFA state.)</span>
     <span class="kw">fn</span> <span class="ident">follow_epsilons</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
@@ -3109,7 +3112,7 @@ implementation.)
         }
         <span class="comment">// If the cache has gotten too big, wipe it.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">approximate_size</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">dfa_size_limit</span>
-            <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">clear_cache_and_save</span>(<span class="ident">current_state</span>)
+            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">clear_cache_and_save</span>(<span class="ident">current_state</span>)
         {
             <span class="comment">// Ooops. DFA is giving up.</span>
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -3173,7 +3176,7 @@ implementation.)
         <span class="comment">// see a match when expanding NFA states previously, then this is a</span>
         <span class="comment">// dead state and no amount of additional input can transition out</span>
         <span class="comment">// of this state.</span>
-        <span class="kw">let</span> <span class="ident">opt_state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">insts</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="ident">state_flags</span>.<span class="ident">is_match</span>() {
+        <span class="kw">let</span> <span class="ident">opt_state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">insts</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">state_flags</span>.<span class="ident">is_match</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">StateFlags</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state_flags</span>;
@@ -3228,8 +3231,8 @@ implementation.)
         <span class="comment">// caling it quits.</span>
         <span class="kw">let</span> <span class="ident">nstates</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">compiled</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">flush_count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span>
-            <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">at</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">last_cache_flush</span>
-            <span class="kw-2">&amp;</span><span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">at</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">last_cache_flush</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="number">10</span> <span class="op">*</span> <span class="ident">nstates</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">at</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">last_cache_flush</span>
+            <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">at</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">last_cache_flush</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="number">10</span> <span class="op">*</span> <span class="ident">nstates</span>
         {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -3360,8 +3363,8 @@ implementation.)
         <span class="ident">empty_flags</span>.<span class="ident">start_line</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>;
         <span class="ident">empty_flags</span>.<span class="ident">end_line</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">is_empty</span>();
 
-        <span class="kw">let</span> <span class="ident">is_word_last</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">is_ascii_word</span>();
-        <span class="kw">let</span> <span class="ident">is_word</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span>]).<span class="ident">is_ascii_word</span>();
+        <span class="kw">let</span> <span class="ident">is_word_last</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">is_ascii_word</span>();
+        <span class="kw">let</span> <span class="ident">is_word</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span>]).<span class="ident">is_ascii_word</span>();
         <span class="kw">if</span> <span class="ident">is_word_last</span> {
             <span class="ident">state_flags</span>.<span class="ident">set_word</span>();
         }
@@ -3390,8 +3393,8 @@ implementation.)
         <span class="ident">empty_flags</span>.<span class="ident">end_line</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">is_empty</span>();
 
         <span class="kw">let</span> <span class="ident">is_word_last</span> <span class="op">=</span>
-            <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span>]).<span class="ident">is_ascii_word</span>();
-        <span class="kw">let</span> <span class="ident">is_word</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">is_ascii_word</span>();
+            <span class="ident">at</span> <span class="op">&lt;</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span>]).<span class="ident">is_ascii_word</span>();
+        <span class="kw">let</span> <span class="ident">is_word</span> <span class="op">=</span> <span class="ident">at</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">Byte</span>::<span class="ident">byte</span>(<span class="ident">text</span>[<span class="ident">at</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">is_ascii_word</span>();
         <span class="kw">if</span> <span class="ident">is_word_last</span> {
             <span class="ident">state_flags</span>.<span class="ident">set_word</span>();
         }
@@ -3498,8 +3501,8 @@ implementation.)
     <span class="doccomment">/// Returns true if there is a prefix we can quickly search for.</span>
     <span class="kw">fn</span> <span class="ident">has_prefix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">is_reverse</span>
-            <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>()
-            <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">is_anchored_start</span>
+            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">prog</span>.<span class="ident">is_anchored_start</span>
     }
 
     <span class="doccomment">/// Sets the STATE_START bit in the given state pointer if and only if</span>
@@ -3854,7 +3857,7 @@ implementation.)
             <span class="kw">let</span> <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span>
                 <span class="ident">ips</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ip</span><span class="op">|</span> <span class="ident">ip</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">collect</span>();
             <span class="kw">let</span> <span class="ident">got</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">inst_ptrs</span>().<span class="ident">collect</span>();
-            <span class="ident">expected</span> <span class="op">=</span><span class="op">=</span> <span class="ident">got</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">state</span>.<span class="ident">flags</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">StateFlags</span>(<span class="ident">flags</span>)
+            <span class="ident">expected</span> <span class="op">=</span><span class="op">=</span> <span class="ident">got</span> <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">flags</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">StateFlags</span>(<span class="ident">flags</span>)
         }
         <span class="ident">QuickCheck</span>::<span class="ident">new</span>()
             .<span class="ident">gen</span>(<span class="ident">StdGen</span>::<span class="ident">new</span>(<span class="self">self</span>::<span class="ident">rand</span>::<span class="ident">thread_rng</span>(), <span class="number">10_000</span>))
@@ -3867,7 +3870,7 @@ implementation.)
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
             <span class="ident">write_varu32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">n</span>);
             <span class="kw">let</span> (<span class="ident">got</span>, <span class="ident">nread</span>) <span class="op">=</span> <span class="ident">read_varu32</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
-            <span class="ident">nread</span> <span class="op">=</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">got</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n</span>
+            <span class="ident">nread</span> <span class="op">=</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">got</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n</span>
         }
         <span class="ident">quickcheck</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>);
     }
@@ -3878,7 +3881,7 @@ implementation.)
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
             <span class="ident">write_vari32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">n</span>);
             <span class="kw">let</span> (<span class="ident">got</span>, <span class="ident">nread</span>) <span class="op">=</span> <span class="ident">read_vari32</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
-            <span class="ident">nread</span> <span class="op">=</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">got</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n</span>
+            <span class="ident">nread</span> <span class="op">=</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">got</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n</span>
         }
         <span class="ident">quickcheck</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>);
     }
