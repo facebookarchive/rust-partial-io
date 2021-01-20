@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-0.4.23/src/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-1.0.4/src/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../pin_project_internal/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -381,43 +381,19 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Group</span>, <span class="ident">Spacing</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
+<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">iter</span>::<span class="ident">FromIterator</span>, <span class="ident">mem</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
     <span class="ident">parse</span>::{<span class="ident">Parse</span>, <span class="ident">ParseBuffer</span>, <span class="ident">ParseStream</span>},
+    <span class="ident">parse_quote</span>,
     <span class="ident">punctuated</span>::<span class="ident">Punctuated</span>,
+    <span class="ident">token</span>,
     <span class="ident">visit_mut</span>::{<span class="self">self</span>, <span class="ident">VisitMut</span>},
-    <span class="kw-2">*</span>,
+    <span class="ident">Attribute</span>, <span class="ident">ExprPath</span>, <span class="ident">ExprStruct</span>, <span class="ident">Generics</span>, <span class="ident">Ident</span>, <span class="ident">Item</span>, <span class="ident">Lifetime</span>, <span class="ident">LifetimeDef</span>, <span class="ident">Macro</span>, <span class="ident">PatPath</span>,
+    <span class="ident">PatStruct</span>, <span class="ident">PatTupleStruct</span>, <span class="ident">Path</span>, <span class="ident">PathArguments</span>, <span class="ident">PredicateType</span>, <span class="ident">QSelf</span>, <span class="prelude-ty">Result</span>, <span class="ident">Token</span>, <span class="ident">Type</span>,
+    <span class="ident">TypeParamBound</span>, <span class="ident">TypePath</span>, <span class="ident">Variant</span>, <span class="ident">Visibility</span>, <span class="ident">WherePredicate</span>,
 };
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Variants</span> <span class="op">=</span> <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">Variant</span>, <span class="macro">Token</span><span class="macro">!</span>[,]<span class="op">&gt;</span>;
@@ -435,36 +411,6 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="ident">syn</span>::<span class="ident">parse2</span>(<span class="ident">quote</span>::<span class="macro">quote_spanned</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>)).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>))
     };
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ProjKind</span> {
-    <span class="ident">Mutable</span>,
-    <span class="ident">Immutable</span>,
-    <span class="ident">Owned</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ProjKind</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">ALL</span>: [<span class="self">Self</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="ident">ProjKind</span>::<span class="ident">Mutable</span>, <span class="ident">ProjKind</span>::<span class="ident">Immutable</span>, <span class="ident">ProjKind</span>::<span class="ident">Owned</span>];
-
-    <span class="doccomment">/// Returns the name of the projection method.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">method_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ProjKind</span>::<span class="ident">Mutable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;project&quot;</span>,
-            <span class="ident">ProjKind</span>::<span class="ident">Immutable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;project_ref&quot;</span>,
-            <span class="ident">ProjKind</span>::<span class="ident">Owned</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;project_replace&quot;</span>,
-        }
-    }
-
-    <span class="doccomment">/// Creates the ident of the projected type from the ident of the original</span>
-    <span class="doccomment">/// type.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">proj_ident</span>(<span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ident</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ProjKind</span>::<span class="ident">Mutable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;__{}Projection&quot;</span>, <span class="ident">ident</span>),
-            <span class="ident">ProjKind</span>::<span class="ident">Immutable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;__{}ProjectionRef&quot;</span>, <span class="ident">ident</span>),
-            <span class="ident">ProjKind</span>::<span class="ident">Owned</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;__{}ProjectionOwned&quot;</span>, <span class="ident">ident</span>),
-        }
-    }
 }
 
 <span class="doccomment">/// Determines the lifetime names. Ensure it doesn&#39;t overlap with any existing</span>
@@ -518,7 +464,10 @@
     <span class="ident">generics</span>.<span class="ident">params</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">LifetimeDef</span>::<span class="ident">new</span>(<span class="ident">lifetime</span>).<span class="ident">into</span>());
 }
 
-<span class="doccomment">/// Determines the visibility of the projected type and projection method.</span>
+<span class="doccomment">/// Determines the visibility of the projected types and projection methods.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If given visibility is `pub`, returned visibility is `pub(crate)`.</span>
+<span class="doccomment">/// Otherwise, returned visibility is the same as given visibility.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">determine_visibility</span>(<span class="ident">vis</span>: <span class="kw-2">&amp;</span><span class="ident">Visibility</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Visibility</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Visibility</span>::<span class="ident">Public</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">vis</span> {
         <span class="macro">parse_quote_spanned</span><span class="macro">!</span>(<span class="ident">token</span>.<span class="ident">pub_token</span>.<span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">pub</span>(<span class="kw">crate</span>))
@@ -527,7 +476,8 @@
     }
 }
 
-<span class="doccomment">/// Check if `tokens` is an empty `TokenStream`.</span>
+<span class="doccomment">/// Checks if `tokens` is an empty `TokenStream`.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// This is almost equivalent to `syn::parse2::&lt;Nothing&gt;()`, but produces</span>
 <span class="doccomment">/// a better error message and does not require ownership of `tokens`.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_as_empty</span>(<span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -561,11 +511,11 @@
     <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Attribute</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">VecExt</span> {
-    <span class="kw">fn</span> <span class="ident">find_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-}
-
 <span class="kw">impl</span> <span class="ident">SliceExt</span> <span class="kw">for</span> [<span class="ident">Attribute</span>] {
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * There are multiple specified attributes.</span>
+    <span class="doccomment">/// * The `Attribute::tokens` field of the specified attribute is not empty.</span>
     <span class="kw">fn</span> <span class="ident">position_exact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>()
             .<span class="ident">try_fold</span>((<span class="number">0</span>, <span class="prelude-val">None</span>), <span class="op">|</span>(<span class="ident">i</span>, <span class="kw-2">mut</span> <span class="ident">prev</span>), <span class="ident">attr</span><span class="op">|</span> {
@@ -581,13 +531,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">ident</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">i</span>))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">VecExt</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">find_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">position_exact</span>(<span class="ident">ident</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">pos</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">i</span>)))
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">ident</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>])
     }
 }
 

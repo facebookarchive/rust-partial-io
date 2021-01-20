@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-0.4.23/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-1.0.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../pin_project/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -255,6 +255,33 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A crate for safe and ergonomic [pin-projection].</span>
 <span class="doccomment">//!</span>
@@ -285,24 +312,54 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [*code like this will be generated*][struct-default-expanded]</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! To use `#[pin_project]` on enums, you need to name the projection type</span>
+<span class="doccomment">//! returned from the method.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use pin_project::pin_project;</span>
+<span class="doccomment">//! use std::pin::Pin;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[pin_project(project = EnumProj)]</span>
+<span class="doccomment">//! enum Enum&lt;T, U&gt; {</span>
+<span class="doccomment">//!     Pinned(#[pin] T),</span>
+<span class="doccomment">//!     Unpinned(U),</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! impl&lt;T, U&gt; Enum&lt;T, U&gt; {</span>
+<span class="doccomment">//!     fn method(self: Pin&lt;&amp;mut Self&gt;) {</span>
+<span class="doccomment">//!         match self.project() {</span>
+<span class="doccomment">//!             EnumProj::Pinned(x) =&gt; {</span>
+<span class="doccomment">//!                 let _: Pin&lt;&amp;mut T&gt; = x;</span>
+<span class="doccomment">//!             }</span>
+<span class="doccomment">//!             EnumProj::Unpinned(y) =&gt; {</span>
+<span class="doccomment">//!                 let _: &amp;mut U = y;</span>
+<span class="doccomment">//!             }</span>
+<span class="doccomment">//!         }</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [*code like this will be generated*][enum-default-expanded]</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! See [`#[pin_project]`][`pin_project`] attribute for more details, and</span>
 <span class="doccomment">//! see [examples] directory for more examples and generated code.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`pin_project`]: attr.pin_project.html</span>
 <span class="doccomment">//! [examples]: https://github.com/taiki-e/pin-project/blob/master/examples/README.md</span>
-<span class="doccomment">//! [pin-projection]: https://doc.rust-lang.org/nightly/std/pin/index.html#projections-and-structural-pinning</span>
+<span class="doccomment">//! [enum-default-expanded]: https://github.com/taiki-e/pin-project/blob/master/examples/enum-default-expanded.rs</span>
+<span class="doccomment">//! [pin-projection]: core::pin#projections-and-structural-pinning</span>
 <span class="doccomment">//! [struct-default-expanded]: https://github.com/taiki-e/pin-project/blob/master/examples/struct-default-expanded.rs</span>
 
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/pin-project/0.4.23&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(
     <span class="ident">no_crate_inject</span>,
-    <span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">warnings</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">single_use_lifetimes</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))
+    <span class="ident">attr</span>(
+        <span class="ident">deny</span>(<span class="ident">warnings</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">single_use_lifetimes</span>),
+        <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unused_variables</span>)
+    )
 ))]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">single_use_lifetimes</span>, <span class="ident">unreachable_pub</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">future_incompatible</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">single_use_lifetimes</span>, <span class="ident">unreachable_pub</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>, <span class="ident">clippy</span>::<span class="ident">default_trait_access</span>)]</span>
-<span class="comment">// mem::take and #[non_exhaustive] requires Rust 1.40</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">mem_replace_with_default</span>, <span class="ident">clippy</span>::<span class="ident">manual_non_exhaustive</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">needless_doctest_main</span>)]</span>
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
@@ -311,25 +368,14 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin_project_internal</span>::<span class="ident">pinned_drop</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin_project_internal</span>::<span class="ident">project</span>;
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin_project_internal</span>::<span class="ident">project_ref</span>;
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin_project_internal</span>::<span class="ident">project_replace</span>;
-
 <span class="doccomment">/// A trait used for custom implementations of [`Unpin`].</span>
-<span class="doccomment">/// This trait is used in conjunction with the `UnsafeUnpin`</span>
-<span class="doccomment">/// argument to [`#[pin_project]`][`pin_project`]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This trait is used in conjunction with the `UnsafeUnpin` argument to</span>
+<span class="doccomment">/// the [`#[pin_project]`][macro@pin_project] attribute.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The Rust [`Unpin`] trait is safe to implement - by itself,</span>
-<span class="doccomment">/// implementing it cannot lead to undefined behavior. Undefined</span>
-<span class="doccomment">/// behavior can only occur when other unsafe code is used.</span>
+<span class="doccomment">/// implementing it cannot lead to [undefined behavior][undefined-behavior].</span>
+<span class="doccomment">/// Undefined behavior can only occur when other unsafe code is used.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// It turns out that using pin projections, which requires unsafe code,</span>
 <span class="doccomment">/// imposes additional requirements on an [`Unpin`] impl. Normally, all of this</span>
@@ -367,19 +413,19 @@
 <span class="doccomment">/// use pin_project::{pin_project, UnsafeUnpin};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[pin_project(UnsafeUnpin)]</span>
-<span class="doccomment">/// struct Foo&lt;K, V&gt; {</span>
+<span class="doccomment">/// struct Struct&lt;K, V&gt; {</span>
 <span class="doccomment">///     #[pin]</span>
 <span class="doccomment">///     field_1: K,</span>
 <span class="doccomment">///     field_2: V,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// unsafe impl&lt;K, V&gt; UnsafeUnpin for Foo&lt;K, V&gt; where K: Unpin + Clone {}</span>
+<span class="doccomment">/// unsafe impl&lt;K, V&gt; UnsafeUnpin for Struct&lt;K, V&gt; where K: Unpin + Clone {}</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`PhantomPinned`]: core::marker::PhantomPinned</span>
-<span class="doccomment">/// [`pin_project`]: attr.pin_project.html</span>
-<span class="doccomment">/// [pin-projection]: https://doc.rust-lang.org/nightly/std/pin/index.html#projections-and-structural-pinning</span>
 <span class="doccomment">/// [cargo-geiger]: https://github.com/rust-secure-code/cargo-geiger</span>
+<span class="doccomment">/// [pin-projection]: core::pin#projections-and-structural-pinning</span>
+<span class="doccomment">/// [undefined-behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">UnsafeUnpin</span> {}
 
 <span class="comment">// Not public API.</span>
@@ -399,18 +445,26 @@
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin_project_internal</span>::<span class="ident">__PinProjectInternalDerive</span>;
 
+    <span class="comment">// An internal trait used for custom implementations of [`Drop`].</span>
+    <span class="comment">//</span>
+    <span class="comment">// **Do not call or implement this trait directly.**</span>
+    <span class="comment">//</span>
+    <span class="comment">// # Why this trait is private and `#[pinned_drop]` attribute is needed?</span>
+    <span class="comment">//</span>
     <span class="comment">// Implementing `PinnedDrop::drop` is safe, but calling it is not safe.</span>
     <span class="comment">// This is because destructors can be called multiple times in safe code and</span>
-    <span class="comment">// [double dropping is unsound](https://github.com/rust-lang/rust/pull/62360).</span>
+    <span class="comment">// [double dropping is unsound][rust-lang/rust#62360].</span>
     <span class="comment">//</span>
     <span class="comment">// Ideally, it would be desirable to be able to forbid manual calls in</span>
     <span class="comment">// the same way as [`Drop::drop`], but the library cannot do it. So, by using</span>
-    <span class="comment">// macros and replacing them with private traits, we prevent users from</span>
-    <span class="comment">// calling `PinnedDrop::drop`.</span>
+    <span class="comment">// macros and replacing them with private traits,</span>
+    <span class="comment">// this crate prevent users from calling `PinnedDrop::drop` in safe code.</span>
     <span class="comment">//</span>
-    <span class="comment">// Users can implement [`Drop`] safely using `#[pinned_drop]` and can drop a</span>
-    <span class="comment">// type that implements `PinnedDrop` using the [`drop`] function safely.</span>
-    <span class="comment">// **Do not call or implement this trait directly.**</span>
+    <span class="comment">// This allows implementing [`Drop`] safely using `#[pinned_drop]`.</span>
+    <span class="comment">// Also by using the [`drop`] function just like dropping a type that directly</span>
+    <span class="comment">// implements [`Drop`], can drop safely a type that implements `PinnedDrop`.</span>
+    <span class="comment">//</span>
+    <span class="comment">// [rust-lang/rust#62360]: https://github.com/rust-lang/rust/pull/62360</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PinnedDrop</span> {
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
@@ -478,7 +532,7 @@
     <span class="comment">//</span>
     <span class="comment">// See https://github.com/taiki-e/pin-project/pull/53 for more details.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AlwaysUnpin</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AlwaysUnpin</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">AlwaysUnpin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
 
