@@ -53,14 +53,13 @@
 //! [`GenError`]: trait.GenError.html
 //! [tests in `bzip2-rs`]: https://github.com/alexcrichton/bzip2-rs/blob/master/src/write.rs
 
+use crate::PartialOp;
+use quickcheck::{empty_shrinker, Arbitrary, Gen};
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use std::io;
 use std::marker::PhantomData;
 use std::ops::Deref;
-
-use quickcheck::{empty_shrinker, Arbitrary, Gen};
-use rand::{seq::SliceRandom, Rng};
-
-use crate::PartialOp;
 
 /// Given a custom error generator, randomly generate a list of `PartialOp`s.
 #[derive(Clone, Debug)]
@@ -90,7 +89,7 @@ impl<GE> Deref for PartialWithErrors<GE> {
 /// See [the module level documentation](index.html) for more.
 pub trait GenError: Clone + Default + Send {
     /// Optionally generate an `io::ErrorKind` instance.
-    fn gen_error<G: Gen>(&mut self, g: &mut G) -> Option<io::ErrorKind>;
+    fn gen_error(&mut self, g: &mut Gen) -> Option<io::ErrorKind>;
 }
 
 /// Generate an `ErrorKind::Interrupted` error 20% of the time.
@@ -114,10 +113,11 @@ pub struct GenInterruptedWouldBlock;
 macro_rules! impl_gen_error {
     ($id: ident, [$($errors:expr),+]) => {
         impl GenError for $id {
-            fn gen_error<G: Gen>(&mut self, g: &mut G) -> Option<io::ErrorKind> {
+            fn gen_error(&mut self, g: &mut Gen) -> Option<io::ErrorKind> {
                 // 20% chance to generate an error.
-                if g.gen_ratio(1, 5) {
-                    Some([$($errors,)*].choose(g).unwrap().clone())
+                let mut rng = SmallRng::from_entropy();
+                if rng.gen_ratio(1, 5) {
+                    Some(g.choose(&[$($errors,)*]).unwrap().clone())
                 } else {
                     None
                 }
@@ -141,7 +141,7 @@ impl_gen_error!(
 pub struct GenNoErrors;
 
 impl GenError for GenNoErrors {
-    fn gen_error<G: Gen>(&mut self, _g: &mut G) -> Option<io::ErrorKind> {
+    fn gen_error(&mut self, _g: &mut Gen) -> Option<io::ErrorKind> {
         None
     }
 }
@@ -150,7 +150,7 @@ impl<GE> Arbitrary for PartialWithErrors<GE>
 where
     GE: GenError + 'static,
 {
-    fn arbitrary<G: Gen>(g: &mut G) -> Self {
+    fn arbitrary(g: &mut Gen) -> Self {
         let size = g.size();
         // Generate a sequence of operations. A uniform distribution for this is
         // fine because the goal is to shake bugs out relatively effectively.
@@ -161,7 +161,10 @@ where
                     Some(err) => PartialOp::Err(err),
                     // Don't generate 0 because for writers it can mean that
                     // writes are no longer accepted.
-                    None => PartialOp::Limited(g.gen_range(1, size)),
+                    None => {
+                        let mut rng = SmallRng::from_entropy();
+                        PartialOp::Limited(rng.gen_range(1..size))
+                    }
                 }
             })
             .collect();
@@ -180,7 +183,7 @@ where
 }
 
 impl Arbitrary for PartialOp {
-    fn arbitrary<G: Gen>(_g: &mut G) -> Self {
+    fn arbitrary(_g: &mut Gen) -> Self {
         // We only use this for shrink, so we don't need to implement this.
         unimplemented!();
     }

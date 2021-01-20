@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        features: ['', 'futures03', 'tokio02', 'quickcheck09', 'futures03 quickcheck09', 'tokio02 quickcheck09']
+        features: ['', 'futures03', 'tokio02', 'quickcheck1', 'futures03 quickcheck1', 'tokio02 quickcheck1']
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
