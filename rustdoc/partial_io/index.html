@@ -11,7 +11,7 @@ next <code>read</code>, <code>write</code> or <code>flush</code> call.</li>
 <code>PartialAsyncWrite</code> to wrap existing <code>AsyncRead</code> and <code>AsyncWrite</code>
 implementations. These implementations are task-aware, so they will know
 how to pause and unpause tasks if they return a <code>WouldBlock</code> error.</li>
-<li>With the optional <code>quickcheck09</code> feature, generation of random sequences of
+<li>With the optional <code>quickcheck1</code> feature, generation of random sequences of
 operations which can be provided to one of the wrappers. See the
 <code>quickcheck_types</code> documentation for more.</li>
 </ul>
@@ -39,7 +39,7 @@ them in an invalid state.</li>
 <ol>
 <li>For a known bug involving any of these situations, <code>partial-io</code> can help
 you write a test.</li>
-<li>With the <code>quickcheck09</code> feature enabled, <code>partial-io</code> can also help shake
+<li>With the <code>quickcheck1</code> feature enabled, <code>partial-io</code> can also help shake
 out bugs in your wrapper. See <code>quickcheck_types</code> for more.</li>
 </ol>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>

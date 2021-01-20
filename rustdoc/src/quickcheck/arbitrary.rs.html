@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quickcheck-0.9.2/src/arbitrary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arbitrary.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/quickcheck-1.0.3/src/arbitrary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arbitrary.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../quickcheck/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
@@ -1506,13 +1506,94 @@
 <span id="1503">1503</span>
 <span id="1504">1504</span>
 <span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">char</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{
     <span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>, <span class="ident">BinaryHeap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>, <span class="ident">LinkedList</span>, <span class="ident">VecDeque</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsString</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CString</span>, <span class="ident">OsString</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::{<span class="ident">empty</span>, <span class="ident">once</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{
@@ -1531,101 +1612,59 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
 
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">seq</span>::<span class="ident">SliceRandom</span>;
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="self">self</span>, <span class="ident">Rng</span>, <span class="ident">RngCore</span>};
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="self">self</span>, <span class="ident">Rng</span>, <span class="ident">SeedableRng</span>};
 
-<span class="doccomment">/// `Gen` wraps a `rand::RngCore` with parameters to control the distribution of</span>
-<span class="doccomment">/// random values.</span>
+<span class="doccomment">/// Gen represents a PRNG.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// A value with type satisfying the `Gen` trait can be constructed with the</span>
-<span class="doccomment">/// `gen` function in this crate.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Gen</span>: <span class="ident">RngCore</span> {
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
-}
-
-<span class="doccomment">/// StdGen is the default implementation of `Gen`.</span>
+<span class="doccomment">/// It is the source of randomness from which QuickCheck will generate</span>
+<span class="doccomment">/// values. An instance of `Gen` is passed to every invocation of</span>
+<span class="doccomment">/// `Arbitrary::arbitrary`, which permits callers to use lower level RNG</span>
+<span class="doccomment">/// routines to generate values.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Values of type `StdGen` can be created with the `gen` function in this</span>
-<span class="doccomment">/// crate.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">rng</span>: <span class="ident">R</span>,
+<span class="doccomment">/// It is unspecified whether this is a secure RNG or not. Therefore, callers</span>
+<span class="doccomment">/// should assume it is insecure.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gen</span> {
+    <span class="ident">rng</span>: <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>,
     <span class="ident">size</span>: <span class="ident">usize</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RngCore</span><span class="op">&gt;</span> <span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a `StdGen` with the given configuration using any random number</span>
-    <span class="doccomment">/// generator.</span>
+<span class="kw">impl</span> <span class="ident">Gen</span> {
+    <span class="doccomment">/// Returns a `Gen` with the given size configuration.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `size` parameter controls the size of random values generated. For</span>
-    <span class="doccomment">/// example, it specifies the maximum length of a randomly generated vector</span>
-    <span class="doccomment">/// and also will specify the maximum magnitude of a randomly generated</span>
-    <span class="doccomment">/// number.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rng</span>: <span class="ident">R</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">StdGen</span> { <span class="ident">rng</span>: <span class="ident">rng</span>, <span class="ident">size</span>: <span class="ident">size</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RngCore</span><span class="op">&gt;</span> <span class="ident">RngCore</span> <span class="kw">for</span> <span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">next_u32</span>()
+    <span class="doccomment">/// The `size` parameter controls the size of random values generated.</span>
+    <span class="doccomment">/// For example, it specifies the maximum length of a randomly generated</span>
+    <span class="doccomment">/// vector, but is and should not be used to control the range of a</span>
+    <span class="doccomment">/// randomly generated number. (Unless that number is used to control the</span>
+    <span class="doccomment">/// size of a data structure.)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Gen</span> {
+        <span class="ident">Gen</span> { <span class="ident">rng</span>: <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>(), <span class="ident">size</span>: <span class="ident">size</span> }
     }
 
-    <span class="comment">// some RNGs implement these more efficiently than the default, so</span>
-    <span class="comment">// we might as well defer to them.</span>
-    <span class="kw">fn</span> <span class="ident">next_u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">next_u64</span>()
-    }
-    <span class="kw">fn</span> <span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">fill_bytes</span>(<span class="ident">dest</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">try_fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">rand</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">try_fill_bytes</span>(<span class="ident">dest</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RngCore</span><span class="op">&gt;</span> <span class="ident">Gen</span> <span class="kw">for</span> <span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="doccomment">/// Returns the size configured with this generator.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">size</span>
     }
-}
 
-<span class="doccomment">/// StdThreadGen is an RNG in thread-local memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is the default RNG used by quickcheck.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StdThreadGen</span>(<span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">ThreadRng</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">StdThreadGen</span> {
-    <span class="doccomment">/// Returns a new thread-local RNG.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `size` parameter controls the size of random values generated. For</span>
-    <span class="doccomment">/// example, it specifies the maximum length of a randomly generated vector</span>
-    <span class="doccomment">/// and also will specify the maximum magnitude of a randomly generated</span>
-    <span class="doccomment">/// number.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdThreadGen</span> {
-        <span class="ident">StdThreadGen</span>(<span class="ident">StdGen</span> { <span class="ident">rng</span>: <span class="ident">rand</span>::<span class="ident">thread_rng</span>(), <span class="ident">size</span>: <span class="ident">size</span> })
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RngCore</span> <span class="kw">for</span> <span class="ident">StdThreadGen</span> {
-    <span class="kw">fn</span> <span class="ident">next_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_u32</span>()
+    <span class="doccomment">/// Choose among the possible alternatives in the slice given. If the slice</span>
+    <span class="doccomment">/// is empty, then `None` is returned. Otherwise, a non-`None` value is</span>
+    <span class="doccomment">/// guaranteed to be returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">choose</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">slice</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">rng</span>)
     }
 
-    <span class="comment">// some RNGs implement these more efficiently than the default, so</span>
-    <span class="comment">// we might as well defer to them.</span>
-    <span class="kw">fn</span> <span class="ident">next_u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_u64</span>()
+    <span class="kw">fn</span> <span class="ident">gen</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">where</span>
+        <span class="ident">rand</span>::<span class="ident">distributions</span>::<span class="ident">Standard</span>: <span class="ident">rand</span>::<span class="ident">distributions</span>::<span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>()
     }
-    <span class="kw">fn</span> <span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fill_bytes</span>(<span class="ident">dest</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">try_fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">rand</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">try_fill_bytes</span>(<span class="ident">dest</span>)
-    }
-}
 
-<span class="kw">impl</span> <span class="ident">Gen</span> <span class="kw">for</span> <span class="ident">StdThreadGen</span> {
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">size</span>
+    <span class="kw">fn</span> <span class="ident">gen_range</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">rand</span>::<span class="ident">distributions</span>::<span class="ident">uniform</span>::<span class="ident">SampleUniform</span>,
+        <span class="ident">R</span>: <span class="ident">rand</span>::<span class="ident">distributions</span>::<span class="ident">uniform</span>::<span class="ident">SampleRange</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="ident">range</span>)
     }
 }
 
@@ -1642,31 +1681,53 @@
 <span class="doccomment">/// `Arbitrary` describes types whose values can be randomly generated and</span>
 <span class="doccomment">/// shrunk.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Aside from shrinking, `Arbitrary` is different from the `std::Rand` trait</span>
-<span class="doccomment">/// in that it uses a `Gen` to control the distribution of random values.</span>
+<span class="doccomment">/// Aside from shrinking, `Arbitrary` is different from typical RNGs in that</span>
+<span class="doccomment">/// it respects `Gen::size()` for controlling how much memory a particular</span>
+<span class="doccomment">/// value uses, for practical purposes. For example, `Vec::arbitrary()`</span>
+<span class="doccomment">/// respects `Gen::size()` to decide the maximum `len()` of the vector.</span>
+<span class="doccomment">/// This behavior is necessary due to practical speed and size limitations.</span>
+<span class="doccomment">/// Conversely, `i32::arbitrary()` ignores `size()` since all `i32` values</span>
+<span class="doccomment">/// require `O(1)` memory and operations between `i32`s require `O(1)` time</span>
+<span class="doccomment">/// (with the exception of exponentiation).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// As of now, all types that implement `Arbitrary` must also implement</span>
-<span class="doccomment">/// `Clone`. (I&#39;m not sure if this is a permanent restriction.)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// They must also be sendable and static since every test is run in its own</span>
-<span class="doccomment">/// thread using `thread::Builder::spawn`, which requires the `Send + &#39;static`</span>
-<span class="doccomment">/// bounds.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Arbitrary</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+<span class="doccomment">/// Additionally, all types that implement `Arbitrary` must also implement</span>
+<span class="doccomment">/// `Clone`.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Arbitrary</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    <span class="doccomment">/// Return an arbitrary value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Implementations should respect `Gen::size()` when decisions about how</span>
+    <span class="doccomment">/// big a particular value should be. Implementations should generally</span>
+    <span class="doccomment">/// defer to other `Arbitrary` implementations to generate other random</span>
+    <span class="doccomment">/// values when necessary. The `Gen` type also offers a few RNG helper</span>
+    <span class="doccomment">/// routines.</span>
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
 
+    <span class="doccomment">/// Return an iterator of values that are smaller than itself.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The way in which a value is &quot;smaller&quot; is implementation defined. In</span>
+    <span class="doccomment">/// some cases, the interpretation is obvious: shrinking an integer should</span>
+    <span class="doccomment">/// produce integers smaller than itself. Others are more complex, for</span>
+    <span class="doccomment">/// example, shrinking a `Vec` should both shrink its size and shrink its</span>
+    <span class="doccomment">/// component values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The iterator returned should be bounded to some reasonable size.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It is always correct to return an empty iterator, and indeed, this</span>
+    <span class="doccomment">/// is the default implementation. The downside of this approach is that</span>
+    <span class="doccomment">/// witnesses to failures in properties will be more inscrutable.</span>
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">empty_shrinker</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> () {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> () {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> () {
         ()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">bool</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="ident">g</span>.<span class="ident">gen</span>()
     }
 
@@ -1680,7 +1741,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">gen</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -1700,7 +1761,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span>, <span class="ident">B</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">gen</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
         } <span class="kw">else</span> {
@@ -1729,7 +1790,7 @@
         <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>,)<span class="kw-2">*</span>)
             <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>: <span class="ident">Arbitrary</span>,)<span class="op">*</span>
         {
-            <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">GEN</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GEN</span>) <span class="op">-</span><span class="op">&gt;</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>,)<span class="kw-2">*</span>) {
+            <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>,)<span class="kw-2">*</span>) {
                 (
                     $(
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_param</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>),
@@ -1741,11 +1802,13 @@
                 <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">empty</span>();
                 $(
                     <span class="kw">let</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">chain</span>(<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tuple_index</span>.<span class="ident">shrink</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">shr_value</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">cloned</span>.<span class="ident">clone</span>();
-                        <span class="ident">result</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tuple_index</span> <span class="op">=</span> <span class="ident">shr_value</span>;
-                        <span class="ident">result</span>
-                    }));
+                    <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">chain</span>(
+                        <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tuple_index</span>.<span class="ident">shrink</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">shr_value</span><span class="op">|</span> {
+                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">cloned</span>.<span class="ident">clone</span>();
+                            <span class="ident">result</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tuple_index</span> <span class="op">=</span> <span class="ident">shr_value</span>;
+                            <span class="ident">result</span>
+                        })
+                    );
                 )<span class="op">*</span>
                 <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">iter</span>)
             }
@@ -1776,12 +1839,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
-            <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="ident">s</span>)
+            <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">s</span>)
         };
-        (<span class="number">0</span>..<span class="ident">size</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)).<span class="ident">collect</span>()
+        (<span class="number">0</span>..<span class="ident">size</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">A</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)).<span class="ident">collect</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1890,7 +1953,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Ord</span>, <span class="ident">V</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1906,10 +1969,10 @@
 <span class="kw">impl</span><span class="op">&lt;</span>
         <span class="ident">K</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
         <span class="ident">V</span>: <span class="ident">Arbitrary</span>,
-        <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1921,7 +1984,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1933,7 +1996,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BinaryHeap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1946,12 +2009,10 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span>
-        <span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-        <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>, <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+    <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1963,7 +2024,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1977,7 +2038,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
         <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
     }
@@ -1989,7 +2050,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">IpAddr</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
         <span class="kw">let</span> <span class="ident">ipv4</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen</span>();
         <span class="kw">if</span> <span class="ident">ipv4</span> {
             <span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
@@ -2000,13 +2061,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Ipv4Addr</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv4Addr</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv4Addr</span> {
         <span class="ident">Ipv4Addr</span>::<span class="ident">new</span>(<span class="ident">g</span>.<span class="ident">gen</span>(), <span class="ident">g</span>.<span class="ident">gen</span>(), <span class="ident">g</span>.<span class="ident">gen</span>(), <span class="ident">g</span>.<span class="ident">gen</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Ipv6Addr</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv6Addr</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv6Addr</span> {
         <span class="ident">Ipv6Addr</span>::<span class="ident">new</span>(
             <span class="ident">g</span>.<span class="ident">gen</span>(),
             <span class="ident">g</span>.<span class="ident">gen</span>(),
@@ -2021,25 +2082,25 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">SocketAddr</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddr</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddr</span> {
         <span class="ident">SocketAddr</span>::<span class="ident">new</span>(<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>), <span class="ident">g</span>.<span class="ident">gen</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">SocketAddrV4</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddrV4</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddrV4</span> {
         <span class="ident">SocketAddrV4</span>::<span class="ident">new</span>(<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>), <span class="ident">g</span>.<span class="ident">gen</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">SocketAddrV6</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddrV6</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddrV6</span> {
         <span class="ident">SocketAddrV6</span>::<span class="ident">new</span>(<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>), <span class="ident">g</span>.<span class="ident">gen</span>(), <span class="ident">g</span>.<span class="ident">gen</span>(), <span class="ident">g</span>.<span class="ident">gen</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">PathBuf</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
         <span class="comment">// use some real directories as guesses, so we may end up with</span>
         <span class="comment">// actual working directories in case that is relevant.</span>
         <span class="kw">let</span> <span class="ident">here</span> <span class="op">=</span>
@@ -2047,16 +2108,18 @@
         <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">temp_dir</span>();
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="kw">let</span> <span class="ident">home</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">home_dir</span>().<span class="ident">unwrap_or</span>(<span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;/home/user&quot;</span>));
-        <span class="kw">let</span> <span class="ident">choices</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">here</span>,
-            <span class="ident">temp</span>,
-            <span class="ident">home</span>,
-            <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;.&quot;</span>),
-            <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;..&quot;</span>),
-            <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;../../..&quot;</span>),
-            <span class="ident">PathBuf</span>::<span class="ident">new</span>(),
-        ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">choices</span>.<span class="ident">choose</span>(<span class="ident">g</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">g</span>
+            .<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[
+                <span class="ident">here</span>,
+                <span class="ident">temp</span>,
+                <span class="ident">home</span>,
+                <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;.&quot;</span>),
+                <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;..&quot;</span>),
+                <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;../../..&quot;</span>),
+                <span class="ident">PathBuf</span>::<span class="ident">new</span>(),
+            ])
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">to_owned</span>();
         <span class="ident">p</span>.<span class="ident">extend</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>).<span class="ident">iter</span>());
         <span class="ident">p</span>
     }
@@ -2088,7 +2151,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">OsString</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OsString</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OsString</span> {
         <span class="ident">OsString</span>::<span class="ident">from</span>(<span class="ident">String</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
     }
 
@@ -2099,16 +2162,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
-            <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="ident">s</span>)
+            <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">s</span>)
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">with_capacity</span>(<span class="ident">size</span>);
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">size</span> {
-            <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">char</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>));
-        }
-        <span class="ident">s</span>
+        (<span class="number">0</span>..<span class="ident">size</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">char</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)).<span class="ident">collect</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2118,18 +2177,58 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">CString</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
+            <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">s</span>)
+        };
+        <span class="comment">// Use either random bytes or random UTF-8 encoded codepoints.</span>
+        <span class="kw">let</span> <span class="ident">utf8</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen</span>();
+        <span class="kw">if</span> <span class="ident">utf8</span> {
+            <span class="ident">CString</span>::<span class="ident">new</span>(
+                (<span class="number">0</span>..)
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">char</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\0&#39;</span>)
+                    .<span class="ident">take</span>(<span class="ident">size</span>)
+                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(),
+            )
+        } <span class="kw">else</span> {
+            <span class="ident">CString</span>::<span class="ident">new</span>(
+                (<span class="number">0</span>..)
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">u8</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;\0&#39;</span>)
+                    .<span class="ident">take</span>(<span class="ident">size</span>)
+                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+            )
+        }
+        .<span class="ident">expect</span>(<span class="string">&quot;null characters should have been filtered out&quot;</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CString</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="comment">// Use the implementation for a vec here, but make sure null characters</span>
+        <span class="comment">// are filtered out.</span>
+        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">VecShrinker</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> {
+            <span class="ident">CString</span>::<span class="ident">new</span>(
+                <span class="ident">bytes</span>.<span class="ident">into_iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+            )
+            .<span class="ident">expect</span>(<span class="string">&quot;null characters should have been filtered out&quot;</span>)
+        }))
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">char</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
-        <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">100</span>);
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+        <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">100</span>);
         <span class="kw">match</span> <span class="ident">mode</span> {
             <span class="number">0</span>..<span class="op">=</span><span class="number">49</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// ASCII + some control characters</span>
-                <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">0xB0</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="ident">char</span>
+                <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">0xB0</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="ident">char</span>
             }
             <span class="number">50</span>..<span class="op">=</span><span class="number">59</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Unicode BMP characters</span>
                 <span class="kw">loop</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">char</span>::<span class="ident">from_u32</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">0x10000</span>)) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">char</span>::<span class="ident">from_u32</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">0x10000</span>)) {
                         <span class="kw">return</span> <span class="ident">x</span>;
                     }
                     <span class="comment">// ignore surrogate pairs</span>
@@ -2137,20 +2236,19 @@
             }
             <span class="number">60</span>..<span class="op">=</span><span class="number">84</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Characters often used in programming languages</span>
-                [
+                <span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[
                     <span class="string">&#39; &#39;</span>, <span class="string">&#39; &#39;</span>, <span class="string">&#39; &#39;</span>, <span class="string">&#39;\t&#39;</span>, <span class="string">&#39;\n&#39;</span>, <span class="string">&#39;~&#39;</span>, <span class="string">&#39;`&#39;</span>, <span class="string">&#39;!&#39;</span>, <span class="string">&#39;@&#39;</span>, <span class="string">&#39;#&#39;</span>, <span class="string">&#39;$&#39;</span>,
                     <span class="string">&#39;%&#39;</span>, <span class="string">&#39;^&#39;</span>, <span class="string">&#39;&amp;&#39;</span>, <span class="string">&#39;*&#39;</span>, <span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>, <span class="string">&#39;_&#39;</span>, <span class="string">&#39;-&#39;</span>, <span class="string">&#39;=&#39;</span>, <span class="string">&#39;+&#39;</span>, <span class="string">&#39;[&#39;</span>,
                     <span class="string">&#39;]&#39;</span>, <span class="string">&#39;{&#39;</span>, <span class="string">&#39;}&#39;</span>, <span class="string">&#39;:&#39;</span>, <span class="string">&#39;;&#39;</span>, <span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;\\&#39;</span>, <span class="string">&#39;|&#39;</span>, <span class="string">&#39;,&#39;</span>, <span class="string">&#39;&lt;&#39;</span>,
                     <span class="string">&#39;&gt;&#39;</span>, <span class="string">&#39;.&#39;</span>, <span class="string">&#39;/&#39;</span>, <span class="string">&#39;?&#39;</span>, <span class="string">&#39;0&#39;</span>, <span class="string">&#39;1&#39;</span>, <span class="string">&#39;2&#39;</span>, <span class="string">&#39;3&#39;</span>, <span class="string">&#39;4&#39;</span>, <span class="string">&#39;5&#39;</span>, <span class="string">&#39;6&#39;</span>,
                     <span class="string">&#39;7&#39;</span>, <span class="string">&#39;8&#39;</span>, <span class="string">&#39;9&#39;</span>,
-                ]
-                .<span class="ident">choose</span>(<span class="ident">g</span>)
+                ])
                 .<span class="ident">unwrap</span>()
                 .<span class="ident">to_owned</span>()
             }
             <span class="number">85</span>..<span class="op">=</span><span class="number">89</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Tricky Unicode, part 1</span>
-                [
+                <span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[
                     <span class="string">&#39;\u{0149}&#39;</span>, <span class="comment">// a deprecated character</span>
                     <span class="string">&#39;\u{fff0}&#39;</span>, <span class="comment">// some of &quot;Other, format&quot; category:</span>
                     <span class="string">&#39;\u{fff1}&#39;</span>,
@@ -2200,14 +2298,13 @@
                     <span class="string">&#39;\u{1680}&#39;</span>,
                     <span class="comment">// other space characters are already covered by two next</span>
                     <span class="comment">// branches</span>
-                ]
-                .<span class="ident">choose</span>(<span class="ident">g</span>)
+                ])
                 .<span class="ident">unwrap</span>()
                 .<span class="ident">to_owned</span>()
             }
             <span class="number">90</span>..<span class="op">=</span><span class="number">94</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Tricky unicode, part 2</span>
-                <span class="ident">char</span>::<span class="ident">from_u32</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0x2000</span>, <span class="number">0x2070</span>)).<span class="ident">unwrap</span>()
+                <span class="ident">char</span>::<span class="ident">from_u32</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0x2000</span>..<span class="number">0x2070</span>)).<span class="ident">unwrap</span>()
             }
             <span class="number">95</span>..<span class="op">=</span><span class="number">99</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Completely arbitrary characters</span>
@@ -2260,15 +2357,23 @@
     };
 }
 
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unsigned_problem_values</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span>[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">min_value</span>(), <span class="number">1</span>, <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">max_value</span>()]
+    };
+}
+
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unsigned_arbitrary</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">tt</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>)]</span>
-                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>;
-                    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::{<span class="ident">min</span>, <span class="ident">max</span>};
-                    <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="ident">max</span>(<span class="number">1</span>, <span class="ident">min</span>(<span class="ident">s</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">max_value</span>())))
+                <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
+                    <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">10</span>) {
+                        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">g</span>.<span class="ident">choose</span>(<span class="macro">unsigned_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)).<span class="ident">unwrap</span>()
+                        },
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">g</span>.<span class="ident">gen</span>()
+                    }
                 }
                 <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="op">&gt;</span> {
                     <span class="macro">unsigned_shrinker</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
@@ -2280,11 +2385,7 @@
 }
 
 <span class="macro">unsigned_arbitrary</span><span class="macro">!</span> {
-    <span class="ident">usize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>
-}
-
-<span class="macro">unsigned_arbitrary</span><span class="macro">!</span> {
-    <span class="ident">u128</span>
+    <span class="ident">usize</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">signed_shrinker</span> {
@@ -2302,7 +2403,7 @@
                     } <span class="kw">else</span> {
                         <span class="kw">let</span> <span class="ident">shrinker</span> <span class="op">=</span> <span class="ident">SignedShrinker</span> { <span class="ident">x</span>: <span class="ident">x</span>, <span class="ident">i</span>: <span class="ident">x</span> <span class="op">/</span> <span class="number">2</span> };
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>];
-                        <span class="kw">if</span> <span class="ident">shrinker</span>.<span class="ident">i</span> <span class="op">&lt;</span> <span class="number">0</span> {
+                        <span class="kw">if</span> <span class="ident">shrinker</span>.<span class="ident">i</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">shrinker</span>.<span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>::<span class="ident">MIN</span> {
                             <span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">shrinker</span>.<span class="ident">x</span>.<span class="ident">abs</span>());
                         }
                         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">items</span>.<span class="ident">into_iter</span>().<span class="ident">chain</span>(<span class="ident">shrinker</span>))
@@ -2313,7 +2414,9 @@
             <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SignedShrinker</span> {
                 <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>;
                 <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">i</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>() {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>::<span class="ident">MIN</span>
+                        <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">i</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">abs</span>()
+                    {
                         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">i</span>);
                         <span class="self">self</span>.<span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">i</span> <span class="op">/</span> <span class="number">2</span>;
                         <span class="ident">result</span>
@@ -2326,19 +2429,23 @@
     };
 }
 
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">signed_problem_values</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;</span>[<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">min_value</span>(), <span class="number">0</span>, <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">max_value</span>()]
+    };
+}
+
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">signed_arbitrary</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">tt</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::{<span class="ident">min</span>,<span class="ident">max</span>};
-                    <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">g</span>.<span class="ident">size</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
-                    <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">upper</span> <span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">usize</span> {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">min_value</span>()
-                    } <span class="kw">else</span> {
-                        <span class="op">-</span>(<span class="ident">upper</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)
-                    };
-                    <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="ident">lower</span>, <span class="ident">max</span>(<span class="number">1</span>, <span class="ident">upper</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>))
+                <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
+                    <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">10</span>) {
+                        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">g</span>.<span class="ident">choose</span>(<span class="macro">signed_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)).<span class="ident">unwrap</span>()
+                        },
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">g</span>.<span class="ident">gen</span>()
+                    }
                 }
                 <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="op">&gt;</span> {
                     <span class="macro">signed_shrinker</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
@@ -2350,24 +2457,42 @@
 }
 
 <span class="macro">signed_arbitrary</span><span class="macro">!</span> {
-    <span class="ident">isize</span>, <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>
+    <span class="ident">isize</span>, <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>
 }
 
-<span class="macro">signed_arbitrary</span><span class="macro">!</span> {
-    <span class="ident">i128</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">float_problem_values</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="comment">// hack. see: https://github.com/rust-lang/rust/issues/48067</span>
+        <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span> <span class="kw">as</span> <span class="ident">p</span>;
+        <span class="kw-2">&amp;</span>[<span class="ident">p</span>::<span class="ident">NAN</span>, <span class="ident">p</span>::<span class="ident">NEG_INFINITY</span>, <span class="ident">p</span>::<span class="ident">MIN</span>, <span class="op">-</span><span class="number">0.</span>, <span class="number">0.</span>, <span class="ident">p</span>::<span class="ident">MAX</span>, <span class="ident">p</span>::<span class="ident">INFINITY</span>]
+    }};
 }
 
-<span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
-        <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="op">-</span>(<span class="ident">s</span> <span class="kw">as</span> <span class="ident">f32</span>), <span class="ident">s</span> <span class="kw">as</span> <span class="ident">f32</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">f32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">signed_shrinker</span><span class="macro">!</span>(<span class="ident">i32</span>);
-        <span class="kw">let</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">shrinker</span>::<span class="ident">SignedShrinker</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">i32</span>);
-        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">it</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">f32</span>))
-    }
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">float_arbitrary</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shrinkable</span>:<span class="ident">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+        <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+            <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+                <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">10</span>) {
+                    <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">g</span>.<span class="ident">choose</span>(<span class="macro">float_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>)).<span class="ident">unwrap</span>(),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span> <span class="kw">as</span> <span class="ident">p</span>;
+                        <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>((<span class="number">0.</span>)..<span class="ident">p</span>::<span class="ident">MAX_EXP</span> <span class="kw">as</span> <span class="ident">i16</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>);
+                        <span class="kw">let</span> <span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>((<span class="number">1.</span>)..<span class="number">2.</span>);
+                        <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[<span class="op">-</span><span class="number">1.</span>, <span class="number">1.</span>]).<span class="ident">unwrap</span>();
+                        <span class="ident">sign</span> <span class="op">*</span> <span class="ident">mantissa</span> <span class="op">*</span> <span class="ident">exp</span>.<span class="ident">exp2</span>()
+                    }
+                }
+            }
+            <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                <span class="macro">signed_shrinker</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">shrinkable</span>);
+                <span class="kw">let</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">shrinker</span>::<span class="ident">SignedShrinker</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shrinkable</span>);
+                <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">it</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>))
+            }
+        }
+    )<span class="kw-2">*</span>};
 }
+
+<span class="macro">float_arbitrary</span><span class="macro">!</span>(<span class="ident">f32</span>, <span class="ident">std</span>::<span class="ident">f32</span>, <span class="ident">i32</span>, <span class="ident">f64</span>, <span class="ident">std</span>::<span class="ident">f64</span>, <span class="ident">i64</span>);
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unsigned_non_zero_shrinker</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -2414,13 +2539,12 @@
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">tt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>:<span class="ident">tt</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>)]</span>
-                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>;
-                    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::{<span class="ident">min</span>, <span class="ident">max</span>};
-                    <span class="kw">let</span> <span class="ident">non_zero</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="ident">max</span>(<span class="number">2</span>, <span class="ident">min</span>(<span class="ident">s</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>::<span class="ident">max_value</span>())));
-                    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">non_zero</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">new</span>(<span class="ident">non_zero</span>).<span class="ident">expect</span>(<span class="string">&quot;non-zero value contsturction failed&quot;</span>)
+                <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen</span>();
+                    <span class="kw">if</span> <span class="ident">v</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                        <span class="ident">v</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    }
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>::<span class="ident">new</span>(<span class="ident">v</span>).<span class="ident">expect</span>(<span class="string">&quot;non-zero value contsturction failed&quot;</span>)
                 }
 
                 <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2443,20 +2567,8 @@
     <span class="ident">NonZeroU128</span>  <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u128</span>
 }
 
-<span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
-        <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="op">-</span>(<span class="ident">s</span> <span class="kw">as</span> <span class="ident">f64</span>), <span class="ident">s</span> <span class="kw">as</span> <span class="ident">f64</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">signed_shrinker</span><span class="macro">!</span>(<span class="ident">i64</span>);
-        <span class="kw">let</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">shrinker</span>::<span class="ident">SignedShrinker</span>::<span class="ident">new</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">it</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">f64</span>))
-    }
-}
-
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Wrapping</span>(<span class="ident">T</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2465,8 +2577,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Bound</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bound</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">3</span>) {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bound</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">3</span>) {
             <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bound</span>::<span class="ident">Included</span>(<span class="ident">T</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)),
             <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bound</span>::<span class="ident">Excluded</span>(<span class="ident">T</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bound</span>::<span class="ident">Unbounded</span>,
@@ -2486,7 +2598,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)..<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2497,7 +2609,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)..<span class="op">=</span><span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2510,7 +2622,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)..
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2519,7 +2631,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         ..<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2528,7 +2640,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">RangeToInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeToInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeToInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         ..<span class="op">=</span><span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>)
     }
     <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RangeToInclusive</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -2537,15 +2649,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">RangeFull</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeFull</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RangeFull</span> {
         ..
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Duration</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">gen</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">arbitrary</span>(<span class="ident">gen</span>);
-        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">arbitrary</span>(<span class="ident">gen</span>) <span class="op">%</span> <span class="number">1_000_000</span>;
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">gen</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="ident">gen</span>.<span class="ident">size</span>() <span class="kw">as</span> <span class="ident">u64</span>);
+        <span class="kw">let</span> <span class="ident">nanoseconds</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="number">1_000_000</span>);
         <span class="ident">Duration</span>::<span class="ident">new</span>(<span class="ident">seconds</span>, <span class="ident">nanoseconds</span>)
     }
 
@@ -2559,7 +2671,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">A</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
     }
 
@@ -2569,7 +2681,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">A</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>))
     }
 
@@ -2579,7 +2691,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">gen</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">gen</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">after_epoch</span> <span class="op">=</span> <span class="ident">bool</span>::<span class="ident">arbitrary</span>(<span class="ident">gen</span>);
         <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">arbitrary</span>(<span class="ident">gen</span>);
         <span class="kw">if</span> <span class="ident">after_epoch</span> {
@@ -2604,8 +2716,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Arbitrary</span>;
-    <span class="kw">use</span> <span class="ident">rand</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{
         <span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>, <span class="ident">BinaryHeap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>, <span class="ident">LinkedList</span>, <span class="ident">VecDeque</span>,
     };
@@ -2614,42 +2724,94 @@
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">Wrapping</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">PathBuf</span>;
 
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">arby_unit</span>() {
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">arby</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(), ());
     }
 
+    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">arby_int</span> {
+        ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">signed</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arbys</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">1_000_000</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">arby</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">problems</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">signed</span> {
+                    <span class="macro">signed_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>).<span class="ident">iter</span>()
+                } <span class="kw">else</span> {
+                    <span class="macro">unsigned_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>).<span class="ident">iter</span>()
+                };
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">problems</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">arbys</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">arby</span><span class="op">|</span> <span class="ident">arby</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">p</span>)),
+                <span class="string">&quot;Arbitrary does not generate all problematic values&quot;</span>);
+            <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">max_value</span>();
+            <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> (<span class="ident">max</span> <span class="op">+</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">min_value</span>()) <span class="op">/</span> <span class="number">2</span>;
+            <span class="comment">// split full range of $t into chunks</span>
+            <span class="comment">// Arbitrary must return some value in each chunk</span>
+            <span class="kw">let</span> <span class="ident">double_chunks</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">=</span> <span class="number">9</span>;
+            <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">double_chunks</span> <span class="op">*</span> <span class="number">2</span>;  <span class="comment">// chunks must be even</span>
+            <span class="kw">let</span> <span class="ident">lim</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">signed</span> {
+                <span class="ident">Box</span>::<span class="ident">new</span>((<span class="number">0</span>..<span class="op">=</span><span class="ident">chunks</span>)
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="op">-</span> <span class="ident">chunks</span> <span class="op">/</span> <span class="number">2</span>)
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">mid</span> <span class="op">+</span> <span class="ident">max</span> <span class="op">/</span> (<span class="ident">chunks</span> <span class="op">/</span> <span class="number">2</span>) <span class="op">*</span> <span class="ident">x</span>))
+            } <span class="kw">else</span> {
+                <span class="ident">Box</span>::<span class="ident">new</span>((<span class="number">0</span>..<span class="op">=</span><span class="ident">chunks</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">max</span> <span class="op">/</span> <span class="ident">chunks</span> <span class="op">*</span> <span class="ident">idx</span>))
+            };
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lim</span> <span class="op">=</span> <span class="ident">lim</span>.<span class="ident">peekable</span>();
+            <span class="kw">while</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">low</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">high</span>)) <span class="op">=</span> (<span class="ident">lim</span>.<span class="ident">next</span>(), <span class="ident">lim</span>.<span class="ident">peek</span>()) {
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">arbys</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">arby</span><span class="op">|</span> <span class="ident">low</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">arby</span> <span class="op">&amp;&amp;</span> <span class="ident">arby</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">high</span>),
+                    <span class="string">&quot;Arbitrary doesn&#39;t generate numbers in {}..={}&quot;</span>, <span class="ident">low</span>, <span class="ident">high</span>)
+            }
+        )<span class="kw-2">*</span>};
+    }
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">arby_int</span>() {
-        <span class="ident">rep</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">isize</span> <span class="op">=</span> <span class="ident">arby</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="op">-</span><span class="number">5</span> <span class="op">&amp;&amp;</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">5</span>);
-        });
+        <span class="macro">arby_int</span><span class="macro">!</span>(<span class="bool-val">true</span>, <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">isize</span>, <span class="ident">i128</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">arby_uint</span>() {
-        <span class="ident">rep</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">arby</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">5</span>);
-        });
+        <span class="macro">arby_int</span><span class="macro">!</span>(<span class="bool-val">false</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">usize</span>, <span class="ident">u128</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">arby</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="kw">super</span>::<span class="ident">Arbitrary</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">A</span> {
-        <span class="kw">super</span>::<span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">gen</span>())
+    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">arby_float</span> {
+        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">path</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$({
+            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span> <span class="kw">as</span> <span class="ident">p</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arbys</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">1_000_000</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">arby</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>());
+            <span class="comment">//NaN != NaN</span>
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">arbys</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_nan</span>()),
+                <span class="string">&quot;Arbitrary does not generate the problematic value NaN&quot;</span>
+            );
+            <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="macro">float_problem_values</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>).<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">is_nan</span>()) {
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">arbys</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">arby</span><span class="op">|</span> <span class="ident">arby</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">p</span>),
+                    <span class="string">&quot;Arbitrary does not generate the problematic value {}&quot;</span>,
+                    <span class="ident">p</span>
+                );
+            }
+            <span class="comment">// split full range of $t into chunks</span>
+            <span class="comment">// Arbitrary must return some value in each chunk</span>
+            <span class="kw">let</span> <span class="ident">double_chunks</span>: <span class="ident">i8</span> <span class="op">=</span> <span class="number">9</span>;
+            <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">double_chunks</span> <span class="op">*</span> <span class="number">2</span>;  <span class="comment">// chunks must be even</span>
+            <span class="kw">let</span> <span class="ident">lim</span> <span class="op">=</span> (<span class="op">-</span><span class="ident">double_chunks</span>..<span class="op">=</span><span class="ident">double_chunks</span>)
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">from</span>(<span class="ident">idx</span>))
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">p</span>::<span class="ident">MAX</span><span class="op">/</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>::<span class="ident">from</span>(<span class="ident">chunks</span><span class="op">/</span><span class="number">2</span>)) <span class="op">*</span> <span class="ident">idx</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lim</span> <span class="op">=</span> <span class="ident">lim</span>.<span class="ident">peekable</span>();
+            <span class="kw">while</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">low</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">high</span>)) <span class="op">=</span> (<span class="ident">lim</span>.<span class="ident">next</span>(), <span class="ident">lim</span>.<span class="ident">peek</span>()) {
+                <span class="macro">assert</span><span class="macro">!</span>(
+                    <span class="ident">arbys</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">arby</span><span class="op">|</span> <span class="ident">low</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">arby</span> <span class="op">&amp;&amp;</span> <span class="ident">arby</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">high</span>),
+                    <span class="string">&quot;Arbitrary doesn&#39;t generate numbers in {:e}..={:e}&quot;</span>,
+                    <span class="ident">low</span>,
+                    <span class="ident">high</span>,
+                )
+            }
+        })<span class="kw-2">*</span>};
     }
 
-    <span class="kw">fn</span> <span class="ident">gen</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">StdGen</span><span class="op">&lt;</span><span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">ThreadRng</span><span class="op">&gt;</span> {
-        <span class="kw">super</span>::<span class="ident">StdGen</span>::<span class="ident">new</span>(<span class="ident">rand</span>::<span class="ident">thread_rng</span>(), <span class="number">5</span>)
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">arby_float</span>() {
+        <span class="macro">arby_float</span><span class="macro">!</span>(<span class="ident">f32</span>, <span class="ident">std</span>::<span class="ident">f32</span>, <span class="ident">f64</span>, <span class="ident">std</span>::<span class="ident">f64</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">rep</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>() <span class="op">-</span><span class="op">&gt;</span> (),
-    {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-            <span class="ident">f</span>()
-        }
+    <span class="kw">fn</span> <span class="ident">arby</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Arbitrary</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">A</span> {
+        <span class="ident">Arbitrary</span>::<span class="ident">arbitrary</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>::<span class="ident">new</span>(<span class="number">5</span>))
     }
 
     <span class="comment">// Shrink testing.</span>

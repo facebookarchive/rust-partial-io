@@ -178,7 +178,7 @@
 <span class="doccomment">//!   `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`</span>
 <span class="doccomment">//!   implementations. These implementations are task-aware, so they will know</span>
 <span class="doccomment">//!   how to pause and unpause tasks if they return a `WouldBlock` error.</span>
-<span class="doccomment">//! * With the optional `quickcheck09` feature, generation of random sequences of</span>
+<span class="doccomment">//! * With the optional `quickcheck1` feature, generation of random sequences of</span>
 <span class="doccomment">//!   operations which can be provided to one of the wrappers. See the</span>
 <span class="doccomment">//!   `quickcheck_types` documentation for more.</span>
 <span class="doccomment">//!</span>
@@ -208,7 +208,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! 1. For a known bug involving any of these situations, `partial-io` can help</span>
 <span class="doccomment">//!    you write a test.</span>
-<span class="doccomment">//! 2. With the `quickcheck09` feature enabled, `partial-io` can also help shake</span>
+<span class="doccomment">//! 2. With the `quickcheck1` feature enabled, `partial-io` can also help shake</span>
 <span class="doccomment">//!    out bugs in your wrapper. See `quickcheck_types` for more.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
@@ -247,7 +247,7 @@
 <span class="kw">mod</span> <span class="ident">async_write</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures03&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">futures_util</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck09&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck1&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">quickcheck_types</span>;
 <span class="kw">mod</span> <span class="ident">read</span>;
 <span class="kw">mod</span> <span class="ident">write</span>;

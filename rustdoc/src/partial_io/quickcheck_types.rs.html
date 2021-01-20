@@ -199,6 +199,9 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -255,14 +258,13 @@
 <span class="doccomment">//! [`GenError`]: trait.GenError.html</span>
 <span class="doccomment">//! [tests in `bzip2-rs`]: https://github.com/alexcrichton/bzip2-rs/blob/master/src/write.rs</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">PartialOp</span>;
+<span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">empty_shrinker</span>, <span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
+<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>;
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">Rng</span>, <span class="ident">SeedableRng</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
-
-<span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">empty_shrinker</span>, <span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">seq</span>::<span class="ident">SliceRandom</span>, <span class="ident">Rng</span>};
-
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">PartialOp</span>;
 
 <span class="doccomment">/// Given a custom error generator, randomly generate a list of `PartialOp`s.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -292,7 +294,7 @@
 <span class="doccomment">/// See [the module level documentation](index.html) for more.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GenError</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Send</span> {
     <span class="doccomment">/// Optionally generate an `io::ErrorKind` instance.</span>
-    <span class="kw">fn</span> <span class="ident">gen_error</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">gen_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Generate an `ErrorKind::Interrupted` error 20% of the time.</span>
@@ -316,10 +318,11 @@
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_gen_error</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>, [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">errors</span>:<span class="ident">expr</span>),<span class="op">+</span>]) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> <span class="ident">GenError</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
-            <span class="kw">fn</span> <span class="ident">gen_error</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">gen_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span> {
                 <span class="comment">// 20% chance to generate an error.</span>
-                <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">gen_ratio</span>(<span class="number">1</span>, <span class="number">5</span>) {
-                    <span class="prelude-val">Some</span>([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">errors</span>,)<span class="kw-2">*</span>].<span class="ident">choose</span>(<span class="ident">g</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>())
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>();
+                <span class="kw">if</span> <span class="ident">rng</span>.<span class="ident">gen_ratio</span>(<span class="number">1</span>, <span class="number">5</span>) {
+                    <span class="prelude-val">Some</span>(<span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">errors</span>,)<span class="kw-2">*</span>]).<span class="ident">unwrap</span>().<span class="ident">clone</span>())
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
                 }
@@ -343,7 +346,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenNoErrors</span>;
 
 <span class="kw">impl</span> <span class="ident">GenError</span> <span class="kw">for</span> <span class="ident">GenNoErrors</span> {
-    <span class="kw">fn</span> <span class="ident">gen_error</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">gen_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="ident">ErrorKind</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -352,7 +355,7 @@
 <span class="kw">where</span>
     <span class="ident">GE</span>: <span class="ident">GenError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">size</span>();
         <span class="comment">// Generate a sequence of operations. A uniform distribution for this is</span>
         <span class="comment">// fine because the goal is to shake bugs out relatively effectively.</span>
@@ -363,7 +366,10 @@
                     <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PartialOp</span>::<span class="prelude-val">Err</span>(<span class="ident">err</span>),
                     <span class="comment">// Don&#39;t generate 0 because for writers it can mean that</span>
                     <span class="comment">// writes are no longer accepted.</span>
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PartialOp</span>::<span class="ident">Limited</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="ident">size</span>)),
+                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng</span>::<span class="ident">from_entropy</span>();
+                        <span class="ident">PartialOp</span>::<span class="ident">Limited</span>(<span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">1</span>..<span class="ident">size</span>))
+                    }
                 }
             })
             .<span class="ident">collect</span>();
@@ -382,7 +388,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">PartialOp</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">_g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">arbitrary</span>(<span class="ident">_g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Gen</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="comment">// We only use this for shrink, so we don&#39;t need to implement this.</span>
         <span class="macro">unimplemented</span><span class="macro">!</span>();
     }
