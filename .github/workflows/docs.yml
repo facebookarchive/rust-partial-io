@@ -1,8 +1,7 @@
 on:
   push:
     branches:
-      # TODO: update to "trunk" or similar
-      - master
+      - main
 
 name: Docs
 

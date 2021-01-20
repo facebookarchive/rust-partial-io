@@ -2,7 +2,7 @@
 
 [![partial-io on crates.io](https://img.shields.io/crates/v/partial-io)](https://crates.io/crates/partial-io)
 [![Documentation (latest release)](https://docs.rs/partial-io/badge.svg)](https://docs.rs/partial-io/)
-[![Documentation (master)](https://img.shields.io/badge/docs-master-brightgreen)](https://facebookincubator.github.io/rust-partial-io/rustdoc/partial_io/)
+[![Documentation (main)](https://img.shields.io/badge/docs-main-brightgreen)](https://facebookincubator.github.io/rust-partial-io/rustdoc/partial_io/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Helpers for testing I/O behavior with partial, interrupted and blocking reads and writes.
