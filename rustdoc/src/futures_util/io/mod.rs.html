@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.12/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.5/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../futures_util/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -734,106 +734,27 @@
 <span id="731">731</span>
 <span id="732">732</span>
 <span id="733">733</span>
-<span id="734">734</span>
-<span id="735">735</span>
-<span id="736">736</span>
-<span id="737">737</span>
-<span id="738">738</span>
-<span id="739">739</span>
-<span id="740">740</span>
-<span id="741">741</span>
-<span id="742">742</span>
-<span id="743">743</span>
-<span id="744">744</span>
-<span id="745">745</span>
-<span id="746">746</span>
-<span id="747">747</span>
-<span id="748">748</span>
-<span id="749">749</span>
-<span id="750">750</span>
-<span id="751">751</span>
-<span id="752">752</span>
-<span id="753">753</span>
-<span id="754">754</span>
-<span id="755">755</span>
-<span id="756">756</span>
-<span id="757">757</span>
-<span id="758">758</span>
-<span id="759">759</span>
-<span id="760">760</span>
-<span id="761">761</span>
-<span id="762">762</span>
-<span id="763">763</span>
-<span id="764">764</span>
-<span id="765">765</span>
-<span id="766">766</span>
-<span id="767">767</span>
-<span id="768">768</span>
-<span id="769">769</span>
-<span id="770">770</span>
-<span id="771">771</span>
-<span id="772">772</span>
-<span id="773">773</span>
-<span id="774">774</span>
-<span id="775">775</span>
-<span id="776">776</span>
-<span id="777">777</span>
-<span id="778">778</span>
-<span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Asynchronous I/O.</span>
+<span class="doccomment">//! IO</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This module is the asynchronous version of `std::io`. It defines four</span>
-<span class="doccomment">//! traits, [`AsyncRead`], [`AsyncWrite`], [`AsyncSeek`], and [`AsyncBufRead`],</span>
-<span class="doccomment">//! which mirror the `Read`, `Write`, `Seek`, and `BufRead` traits of the</span>
-<span class="doccomment">//! standard library. However, these traits integrate with the asynchronous</span>
-<span class="doccomment">//! task system, so that if an I/O object isn&#39;t ready for reading (or writing),</span>
-<span class="doccomment">//! the thread is not blocked, and instead the current task is queued to be</span>
-<span class="doccomment">//! woken when I/O is ready.</span>
+<span class="doccomment">//! This module contains a number of functions for working with</span>
+<span class="doccomment">//! `AsyncRead`, `AsyncWrite`, `AsyncSeek`, and `AsyncBufRead` types, including</span>
+<span class="doccomment">//! the `AsyncReadExt`, `AsyncWriteExt`, `AsyncSeekExt`, and `AsyncBufReadExt`</span>
+<span class="doccomment">//! traits which add methods to the `AsyncRead`, `AsyncWrite`, `AsyncSeek`,</span>
+<span class="doccomment">//! and `AsyncBufRead` types.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! In addition, the [`AsyncReadExt`], [`AsyncWriteExt`], [`AsyncSeekExt`], and</span>
-<span class="doccomment">//! [`AsyncBufReadExt`] extension traits offer a variety of useful combinators</span>
-<span class="doccomment">//! for operating with asynchronous I/O objects, including ways to work with</span>
-<span class="doccomment">//! them using futures, streams and sinks.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module is only available when the `std` feature of this</span>
+<span class="doccomment">//! This module is only available when the `io` and `std` features of this</span>
 <span class="doccomment">//! library is activated, and it is activated by default.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">compat</span>::<span class="ident">Compat</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ptr</span>, <span class="ident">pin</span>::<span class="ident">Pin</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_io</span>::{
     <span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">AsyncSeek</span>, <span class="ident">AsyncBufRead</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>,
     <span class="ident">IoSlice</span>, <span class="ident">IoSliceMut</span>, <span class="prelude-ty">Result</span>, <span class="ident">SeekFrom</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read-initializer&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read-initializer&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_io</span>::<span class="ident">Initializer</span>;
 
 <span class="comment">// used by `BufReader` and `BufWriter`</span>
@@ -881,17 +802,12 @@
 <span class="kw">mod</span> <span class="ident">empty</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">empty</span>::{<span class="ident">empty</span>, <span class="ident">Empty</span>};
 
-<span class="kw">mod</span> <span class="ident">fill_buf</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">fill_buf</span>::<span class="ident">FillBuf</span>;
-
 <span class="kw">mod</span> <span class="ident">flush</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">flush</span>::<span class="ident">Flush</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">into_sink</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">into_sink</span>::<span class="ident">IntoSink</span>;
 
 <span class="kw">mod</span> <span class="ident">lines</span>;
@@ -945,9 +861,9 @@
 <span class="kw">mod</span> <span class="ident">write_all</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">write_all</span>::<span class="ident">WriteAll</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-all-vectored&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write_all_vectored&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">write_all_vectored</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-all-vectored&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write_all_vectored&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">write_all_vectored</span>::<span class="ident">WriteAllVectored</span>;
 
 <span class="doccomment">/// An extension trait which adds utility methods to `AsyncRead` types.</span>
@@ -1193,7 +1109,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `io-compat` feature to enable.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)))]</span>
     <span class="kw">fn</span> <span class="ident">compat</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
@@ -1315,10 +1230,9 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
     <span class="doccomment">/// use futures::io::AsyncWriteExt;</span>
-    <span class="doccomment">/// use futures_util::io::Cursor;</span>
-    <span class="doccomment">/// use std::io::IoSlice;</span>
+    <span class="doccomment">/// use std::io::{Cursor, IoSlice};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut writer = Cursor::new(Vec::new());</span>
+    <span class="doccomment">/// let mut writer = Cursor::new([0u8; 7]);</span>
     <span class="doccomment">/// let bufs = &amp;mut [</span>
     <span class="doccomment">///     IoSlice::new(&amp;[1]),</span>
     <span class="doccomment">///     IoSlice::new(&amp;[2, 3]),</span>
@@ -1326,12 +1240,12 @@
     <span class="doccomment">/// ];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// writer.write_all_vectored(bufs).await?;</span>
-    <span class="doccomment">/// // Note: the contents of `bufs` is now unspecified, see the Notes section.</span>
+    <span class="doccomment">/// // Note: the contents of `bufs` is now undefined, see the Notes section.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(writer.into_inner(), &amp;[1, 2, 3, 4, 5, 6]);</span>
+    <span class="doccomment">/// assert_eq!(writer.into_inner(), [1, 2, 3, 4, 5, 6, 0]);</span>
     <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(()) }).unwrap();</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-all-vectored&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write_all_vectored&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">write_all_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
@@ -1346,7 +1260,6 @@
     <span class="doccomment">/// used as a futures 0.1 / tokio-io 0.1 `AsyncWrite`.</span>
     <span class="doccomment">/// Requires the `io-compat` feature to enable.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-compat&quot;</span>)))]</span>
     <span class="kw">fn</span> <span class="ident">compat_write</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
@@ -1380,7 +1293,6 @@
     <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sink&quot;</span>)))]</span>
     <span class="kw">fn</span> <span class="ident">into_sink</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntoSink</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Item</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
@@ -1408,58 +1320,6 @@
 
 <span class="doccomment">/// An extension trait which adds utility methods to `AsyncBufRead` types.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncBufReadExt</span>: <span class="ident">AsyncBufRead</span> {
-    <span class="doccomment">/// Creates a future which will wait for a non-empty buffer to be available from this I/O</span>
-    <span class="doccomment">/// object or EOF to be reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is the async equivalent to [`BufRead::fill_buf`](std::io::BufRead::fill_buf).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # futures::executor::block_on(async {</span>
-    <span class="doccomment">/// use futures::{io::AsyncBufReadExt as _, stream::{iter, TryStreamExt as _}};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut stream = iter(vec![Ok(vec![1, 2, 3]), Ok(vec![4, 5, 6])]).into_async_read();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![1, 2, 3]);</span>
-    <span class="doccomment">/// stream.consume_unpin(2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![3]);</span>
-    <span class="doccomment">/// stream.consume_unpin(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![4, 5, 6]);</span>
-    <span class="doccomment">/// stream.consume_unpin(3);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![]);</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(()) }).unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">fill_buf</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FillBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Unpin</span>,
-    {
-        <span class="ident">FillBuf</span>::<span class="ident">new</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// A convenience for calling [`AsyncBufRead::consume`] on [`Unpin`] IO types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # futures::executor::block_on(async {</span>
-    <span class="doccomment">/// use futures::{io::AsyncBufReadExt as _, stream::{iter, TryStreamExt as _}};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut stream = iter(vec![Ok(vec![1, 2, 3])]).into_async_read();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![1, 2, 3]);</span>
-    <span class="doccomment">/// stream.consume_unpin(2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![3]);</span>
-    <span class="doccomment">/// stream.consume_unpin(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(stream.fill_buf().await?, vec![]);</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(()) }).unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">consume_unpin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amt</span>: <span class="ident">usize</span>)
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Unpin</span>,
-    {
-        <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="self">self</span>).<span class="ident">consume</span>(<span class="ident">amt</span>)
-    }
-
     <span class="doccomment">/// Creates a future which will read all the bytes associated with this I/O</span>
     <span class="doccomment">/// object into `buf` until the delimiter `byte` or EOF is reached.</span>
     <span class="doccomment">/// This method is the async equivalent to [`BufRead::read_until`](std::io::BufRead::read_until).</span>

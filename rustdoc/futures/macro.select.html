@@ -13,7 +13,7 @@ passed to <code>select!</code> must be <code>Unpin</code> and implement <code>Fu
 (e.g. an <code>async fn</code> call) instead of a <code>Future</code> by name the <code>Unpin</code>
 requirement is relaxed, since the macro will pin the resulting <code>Future</code>
 on the stack. However the <code>Future</code> returned by the expression must
-still implement <code>FusedFuture</code>.</p>
+still implement <code>FusedFuture</code>. This difference is presented</p>
 <p>Futures and streams which are not already fused can be fused using the
 <code>.fuse()</code> method. Note, though, that fusing a future or stream directly
 in the call to <code>select!</code> will not be enough to prevent it from being
@@ -69,7 +69,7 @@ which return <code>Future</code>s - even if those do not implement <code>Unpin</
     <span class="ident">a_res</span> <span class="op">=</span> <span class="ident">async_identity_fn</span>(<span class="number">62</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a_res</span> <span class="op">+</span> <span class="number">1</span>,
     <span class="ident">b_res</span> <span class="op">=</span> <span class="ident">async_identity_fn</span>(<span class="number">13</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b_res</span>,
 };
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="number">63</span> <span class="op">|</span><span class="op">|</span> <span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="number">13</span>);</pre></div>
+<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="number">63</span> <span class="op">|</span><span class="op">|</span> <span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="number">12</span>);</pre></div>
 <p>If a similar async function is called outside of <code>select</code> to produce
 a <code>Future</code>, the <code>Future</code> must be pinned in order to be able to pass
 it to <code>select</code>. This can be achieved via <code>Box::pin</code> for pinning a
