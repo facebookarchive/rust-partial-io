@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.24/src/macros/select.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.1.0/src/macros/select.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -881,6 +881,10 @@
 <span id="878">878</span>
 <span id="879">879</span>
 <span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">/// Wait on multiple concurrent branches, returning when the **first** branch</span>
 <span class="doccomment">/// completes, cancelling the remaining branches.</span>
@@ -947,9 +951,9 @@
 <span class="doccomment">/// Given that `if` preconditions are used to disable `select!` branches, some</span>
 <span class="doccomment">/// caution must be used to avoid missing values.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// For example, here is **incorrect** usage of `delay` with `if`. The objective</span>
+<span class="doccomment">/// For example, here is **incorrect** usage of `sleep` with `if`. The objective</span>
 <span class="doccomment">/// is to repeatedly run an asynchronous task for up to 50 milliseconds.</span>
-<span class="doccomment">/// However, there is a potential for the `delay` completion to be missed.</span>
+<span class="doccomment">/// However, there is a potential for the `sleep` completion to be missed.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```no_run</span>
 <span class="doccomment">/// use tokio::time::{self, Duration};</span>
@@ -960,11 +964,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     let mut delay = time::delay_for(Duration::from_millis(50));</span>
+<span class="doccomment">///     let sleep = time::sleep(Duration::from_millis(50));</span>
+<span class="doccomment">///     tokio::pin!(sleep);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     while !delay.is_elapsed() {</span>
+<span class="doccomment">///     while !sleep.is_elapsed() {</span>
 <span class="doccomment">///         tokio::select! {</span>
-<span class="doccomment">///             _ = &amp;mut delay, if !delay.is_elapsed() =&gt; {</span>
+<span class="doccomment">///             _ = &amp;mut sleep, if !sleep.is_elapsed() =&gt; {</span>
 <span class="doccomment">///                 println!(&quot;operation timed out&quot;);</span>
 <span class="doccomment">///             }</span>
 <span class="doccomment">///             _ = some_async_work() =&gt; {</span>
@@ -975,11 +980,11 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// In the above example, `delay.is_elapsed()` may return `true` even if</span>
-<span class="doccomment">/// `delay.poll()` never returned `Ready`. This opens up a potential race</span>
-<span class="doccomment">/// condition where `delay` expires between the `while !delay.is_elapsed()`</span>
+<span class="doccomment">/// In the above example, `sleep.is_elapsed()` may return `true` even if</span>
+<span class="doccomment">/// `sleep.poll()` never returned `Ready`. This opens up a potential race</span>
+<span class="doccomment">/// condition where `sleep` expires between the `while !sleep.is_elapsed()`</span>
 <span class="doccomment">/// check and the call to `select!` resulting in the `some_async_work()` call to</span>
-<span class="doccomment">/// run uninterrupted despite the delay having elapsed.</span>
+<span class="doccomment">/// run uninterrupted despite the sleep having elapsed.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// One way to write the above example without the race would be:</span>
 <span class="doccomment">///</span>
@@ -987,17 +992,18 @@
 <span class="doccomment">/// use tokio::time::{self, Duration};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// async fn some_async_work() {</span>
-<span class="doccomment">/// # time::delay_for(Duration::from_millis(10)).await;</span>
+<span class="doccomment">/// # time::sleep(Duration::from_millis(10)).await;</span>
 <span class="doccomment">///     // do work</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     let mut delay = time::delay_for(Duration::from_millis(50));</span>
+<span class="doccomment">///     let sleep = time::sleep(Duration::from_millis(50));</span>
+<span class="doccomment">///     tokio::pin!(sleep);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///     loop {</span>
 <span class="doccomment">///         tokio::select! {</span>
-<span class="doccomment">///             _ = &amp;mut delay =&gt; {</span>
+<span class="doccomment">///             _ = &amp;mut sleep =&gt; {</span>
 <span class="doccomment">///                 println!(&quot;operation timed out&quot;);</span>
 <span class="doccomment">///                 break;</span>
 <span class="doccomment">///             }</span>
@@ -1051,7 +1057,7 @@
 <span class="doccomment">/// Basic stream selecting.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::stream::{self, StreamExt};</span>
+<span class="doccomment">/// use tokio_stream::{self as stream, StreamExt};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() {</span>
@@ -1072,7 +1078,7 @@
 <span class="doccomment">/// is complete, all calls to `next()` return `None`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::stream::{self, StreamExt};</span>
+<span class="doccomment">/// use tokio_stream::{self as stream, StreamExt};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() {</span>
@@ -1104,13 +1110,14 @@
 <span class="doccomment">/// Here, a stream is consumed for at most 1 second.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::stream::{self, StreamExt};</span>
+<span class="doccomment">/// use tokio_stream::{self as stream, StreamExt};</span>
 <span class="doccomment">/// use tokio::time::{self, Duration};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() {</span>
 <span class="doccomment">///     let mut stream = stream::iter(vec![1, 2, 3]);</span>
-<span class="doccomment">///     let mut delay = time::delay_for(Duration::from_secs(1));</span>
+<span class="doccomment">///     let sleep = time::sleep(Duration::from_secs(1));</span>
+<span class="doccomment">///     tokio::pin!(sleep);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///     loop {</span>
 <span class="doccomment">///         tokio::select! {</span>
@@ -1121,7 +1128,7 @@
 <span class="doccomment">///                     break;</span>
 <span class="doccomment">///                 }</span>
 <span class="doccomment">///             }</span>
-<span class="doccomment">///             _ = &amp;mut delay =&gt; {</span>
+<span class="doccomment">///             _ = &amp;mut sleep =&gt; {</span>
 <span class="doccomment">///                 println!(&quot;timeout&quot;);</span>
 <span class="doccomment">///                 break;</span>
 <span class="doccomment">///             }</span>
@@ -1288,6 +1295,7 @@
                                 <span class="comment">// The future returned a value, check if matches</span>
                                 <span class="comment">// the specified pattern.</span>
                                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+                                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
                                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">out</span> {
                                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bind</span> <span class="op">=</span><span class="op">&gt;</span> {}
                                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
@@ -1326,7 +1334,7 @@
 
     (@ { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } ) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="comment">// No `else` branch</span>
-        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro">select</span><span class="macro">!</span>(@{ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>; <span class="macro">unreachable</span><span class="macro">!</span>() })
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro">select</span><span class="macro">!</span>(@{ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>; <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;all branches are disabled and there is no else branch&quot;</span>) })
     };
     (@ { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } <span class="kw">else</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">else</span>:<span class="macro-nonterminal">expr</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro">select</span><span class="macro">!</span>(@{ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>; <span class="macro-nonterminal">$</span><span class="kw">else</span> })

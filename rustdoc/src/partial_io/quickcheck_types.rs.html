@@ -199,9 +199,6 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -260,11 +257,8 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">PartialOp</span>;
 <span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">empty_shrinker</span>, <span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">rngs</span>::<span class="ident">SmallRng</span>;
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">Rng</span>, <span class="ident">SeedableRng</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">rngs</span>::<span class="ident">SmallRng</span>, <span class="ident">Rng</span>, <span class="ident">SeedableRng</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">marker</span>::<span class="ident">PhantomData</span>, <span class="ident">ops</span>::<span class="ident">Deref</span>};
 
 <span class="doccomment">/// Given a custom error generator, randomly generate a list of `PartialOp`s.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>

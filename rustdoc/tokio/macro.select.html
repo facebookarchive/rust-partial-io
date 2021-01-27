@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `select` macro in crate `tokio`."><meta name="keywords" content="rust, rustlang, rust-lang, select"><title>tokio::select - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc macro"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../tokio/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class="location"><a href="index.html">tokio</a></p><script>window.sidebarCurrent = {name: "select", ty: "macro", relpath: ""};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/tokio/macros/select.rs.html#285-483" title="goto source code">[src]</a></span><span class="in-band">Macro <a href="index.html">tokio</a>::<wbr><a class="macro" href="">select</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><div class="example-wrap"><pre class="rust macro">
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/tokio/macros/select.rs.html#288-487" title="goto source code">[src]</a></span><span class="in-band">Macro <a href="index.html">tokio</a>::<wbr><a class="macro" href="">select</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><div class="example-wrap"><pre class="rust macro">
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">select</span> {
     (@ {
         <span class="comment">// One `_` for each branch in the `select!` macro. Passing this to</span>
@@ -80,9 +80,9 @@ join handle to <code>select!</code>.</p>
 <h3 id="avoid-racy-if-preconditions" class="section-header"><a href="#avoid-racy-if-preconditions">Avoid racy <code>if</code> preconditions</a></h3>
 <p>Given that <code>if</code> preconditions are used to disable <code>select!</code> branches, some
 caution must be used to avoid missing values.</p>
-<p>For example, here is <strong>incorrect</strong> usage of <code>delay</code> with <code>if</code>. The objective
+<p>For example, here is <strong>incorrect</strong> usage of <code>sleep</code> with <code>if</code>. The objective
 is to repeatedly run an asynchronous task for up to 50 milliseconds.
-However, there is a potential for the <code>delay</code> completion to be missed.</p>
+However, there is a potential for the <code>sleep</code> completion to be missed.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>};
@@ -93,11 +93,12 @@ However, there is a potential for the <code>delay</code> completion to be missed
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
 <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">50</span>));
+    <span class="kw">let</span> <span class="ident">sleep</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">50</span>));
+    <span class="ident">tokio</span>::<span class="macro">pin</span><span class="macro">!</span>(<span class="ident">sleep</span>);
 
-    <span class="kw">while</span> <span class="op">!</span><span class="ident">delay</span>.<span class="ident">is_elapsed</span>() {
+    <span class="kw">while</span> <span class="op">!</span><span class="ident">sleep</span>.<span class="ident">is_elapsed</span>() {
         <span class="ident">tokio</span>::<span class="macro">select</span><span class="macro">!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delay</span>, <span class="kw">if</span> <span class="op">!</span><span class="ident">delay</span>.<span class="ident">is_elapsed</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span>, <span class="kw">if</span> <span class="op">!</span><span class="ident">sleep</span>.<span class="ident">is_elapsed</span>() <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;operation timed out&quot;</span>);
             }
             <span class="kw">_</span> <span class="op">=</span> <span class="ident">some_async_work</span>() <span class="op">=</span><span class="op">&gt;</span> {
@@ -106,11 +107,11 @@ However, there is a potential for the <code>delay</code> completion to be missed
         }
     }
 }</pre></div>
-<p>In the above example, <code>delay.is_elapsed()</code> may return <code>true</code> even if
-<code>delay.poll()</code> never returned <code>Ready</code>. This opens up a potential race
-condition where <code>delay</code> expires between the <code>while !delay.is_elapsed()</code>
+<p>In the above example, <code>sleep.is_elapsed()</code> may return <code>true</code> even if
+<code>sleep.poll()</code> never returned <code>Ready</code>. This opens up a potential race
+condition where <code>sleep</code> expires between the <code>while !sleep.is_elapsed()</code>
 check and the call to <code>select!</code> resulting in the <code>some_async_work()</code> call to
-run uninterrupted despite the delay having elapsed.</p>
+run uninterrupted despite the sleep having elapsed.</p>
 <p>One way to write the above example without the race would be:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
@@ -122,11 +123,12 @@ run uninterrupted despite the delay having elapsed.</p>
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
 <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">50</span>));
+    <span class="kw">let</span> <span class="ident">sleep</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">50</span>));
+    <span class="ident">tokio</span>::<span class="macro">pin</span><span class="macro">!</span>(<span class="ident">sleep</span>);
 
     <span class="kw">loop</span> {
         <span class="ident">tokio</span>::<span class="macro">select</span><span class="macro">!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;operation timed out&quot;</span>);
                 <span class="kw">break</span>;
             }
@@ -171,7 +173,7 @@ expression>.</p>
 <p>Basic stream selecting.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">tokio_stream</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">stream</span>, <span class="ident">StreamExt</span>};
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
 <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -190,7 +192,7 @@ matching and the fact that <code>stream::iter</code> is &quot;fused&quot;, i.e. 
 is complete, all calls to <code>next()</code> return <code>None</code>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">tokio_stream</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">stream</span>, <span class="ident">StreamExt</span>};
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
 <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -216,13 +218,14 @@ future can be made <a href="https://doc.rust-lang.org/nightly/core/marker/trait.
 <p>Here, a stream is consumed for at most 1 second.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">tokio_stream</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">stream</span>, <span class="ident">StreamExt</span>};
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>};
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
 <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">stream</span>::<span class="ident">iter</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
+    <span class="kw">let</span> <span class="ident">sleep</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>));
+    <span class="ident">tokio</span>::<span class="macro">pin</span><span class="macro">!</span>(<span class="ident">sleep</span>);
 
     <span class="kw">loop</span> {
         <span class="ident">tokio</span>::<span class="macro">select</span><span class="macro">!</span> {
@@ -233,7 +236,7 @@ future can be made <a href="https://doc.rust-lang.org/nightly/core/marker/trait.
                     <span class="kw">break</span>;
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delay</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;timeout&quot;</span>);
                 <span class="kw">break</span>;
             }

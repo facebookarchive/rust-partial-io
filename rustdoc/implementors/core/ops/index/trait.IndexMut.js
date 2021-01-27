@@ -1,4 +1,5 @@
 (function() {var implementors = {};
+implementors["bytes"] = [{"text":"impl IndexMut&lt;Range&lt;usize&gt;&gt; for UninitSlice","synthetic":false,"types":[]},{"text":"impl IndexMut&lt;RangeFrom&lt;usize&gt;&gt; for UninitSlice","synthetic":false,"types":[]},{"text":"impl IndexMut&lt;RangeFull&gt; for UninitSlice","synthetic":false,"types":[]},{"text":"impl IndexMut&lt;RangeInclusive&lt;usize&gt;&gt; for UninitSlice","synthetic":false,"types":[]},{"text":"impl IndexMut&lt;RangeTo&lt;usize&gt;&gt; for UninitSlice","synthetic":false,"types":[]},{"text":"impl IndexMut&lt;RangeToInclusive&lt;usize&gt;&gt; for UninitSlice","synthetic":false,"types":[]}];
 implementors["slab"] = [{"text":"impl&lt;T&gt; IndexMut&lt;usize&gt; for Slab&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl&lt;T, P&gt; IndexMut&lt;usize&gt; for Punctuated&lt;T, P&gt;","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -12,5 +12,5 @@ implementors["rand_core"] = [{"text":"impl Error for Error","synthetic":false,"t
 implementors["regex"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["regex_syntax"] = [{"text":"impl Error for Error","synthetic":false,"types":[]},{"text":"impl Error for Error","synthetic":false,"types":[]},{"text":"impl Error for Error","synthetic":false,"types":[]},{"text":"impl Error for CaseFoldError","synthetic":false,"types":[]},{"text":"impl Error for UnicodeWordError","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
-implementors["tokio"] = [{"text":"impl Error for JoinError","synthetic":false,"types":[]},{"text":"impl Error for TryCurrentError","synthetic":false,"types":[]}];
+implementors["tokio"] = [{"text":"impl Error for JoinError","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

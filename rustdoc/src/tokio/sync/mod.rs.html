@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.24/src/sync/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.1.0/src/sync/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -487,6 +487,11 @@
 <span id="484">484</span>
 <span id="485">485</span>
 <span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">loom</span>, <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unreachable_pub</span>, <span class="ident">unused_imports</span>))]</span>
 
@@ -510,7 +515,7 @@
 <span class="doccomment">//! few flavors of channels provided by Tokio. Each channel flavor supports</span>
 <span class="doccomment">//! different message passing patterns. When a channel supports multiple</span>
 <span class="doccomment">//! producers, many separate tasks may **send** messages. When a channel</span>
-<span class="doccomment">//! supports muliple consumers, many different separate tasks may **receive**</span>
+<span class="doccomment">//! supports multiple consumers, many different separate tasks may **receive**</span>
 <span class="doccomment">//! messages.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tokio provides many different channel flavors as different message passing</span>
@@ -596,7 +601,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! #[tokio::main]</span>
 <span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     let (mut tx, mut rx) = mpsc::channel(100);</span>
+<span class="doccomment">//!     let (tx, mut rx) = mpsc::channel(100);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     tokio::spawn(async move {</span>
 <span class="doccomment">//!         for i in 0..10 {</span>
@@ -640,7 +645,7 @@
 <span class="doccomment">//!     for _ in 0..10 {</span>
 <span class="doccomment">//!         // Each task needs its own `tx` handle. This is done by cloning the</span>
 <span class="doccomment">//!         // original handle.</span>
-<span class="doccomment">//!         let mut tx = tx.clone();</span>
+<span class="doccomment">//!         let tx = tx.clone();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!         tokio::spawn(async move {</span>
 <span class="doccomment">//!             tx.send(&amp;b&quot;data to write&quot;[..]).await.unwrap();</span>
@@ -703,7 +708,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Spawn tasks that will send the increment command.</span>
 <span class="doccomment">//!     for _ in 0..10 {</span>
-<span class="doccomment">//!         let mut cmd_tx = cmd_tx.clone();</span>
+<span class="doccomment">//!         let cmd_tx = cmd_tx.clone();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!         join_handles.push(tokio::spawn(async move {</span>
 <span class="doccomment">//!             let (resp_tx, resp_rx) = oneshot::channel();</span>
@@ -812,7 +817,7 @@
 <span class="doccomment">//!     tokio::spawn(async move {</span>
 <span class="doccomment">//!         loop {</span>
 <span class="doccomment">//!             // Wait 10 seconds between checks</span>
-<span class="doccomment">//!             time::delay_for(Duration::from_secs(10)).await;</span>
+<span class="doccomment">//!             time::sleep(Duration::from_secs(10)).await;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!             // Load the configuration file</span>
 <span class="doccomment">//!             let new_config = Config::load_from_file().await.unwrap();</span>
@@ -820,7 +825,7 @@
 <span class="doccomment">//!             // If the configuration changed, send the new config value</span>
 <span class="doccomment">//!             // on the watch channel.</span>
 <span class="doccomment">//!             if new_config != config {</span>
-<span class="doccomment">//!                 tx.broadcast(new_config.clone()).unwrap();</span>
+<span class="doccomment">//!                 tx.send(new_config.clone()).unwrap();</span>
 <span class="doccomment">//!                 config = new_config;</span>
 <span class="doccomment">//!             }</span>
 <span class="doccomment">//!         }</span>
@@ -845,17 +850,16 @@
 <span class="doccomment">//!             let op = my_async_operation();</span>
 <span class="doccomment">//!             tokio::pin!(op);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!             // Receive the **initial** configuration value. As this is the</span>
-<span class="doccomment">//!             // first time the config is received from the watch, it will</span>
-<span class="doccomment">//!             // always complete immediatedly.</span>
-<span class="doccomment">//!             let mut conf = rx.recv().await.unwrap();</span>
+<span class="doccomment">//!             // Get the initial config value</span>
+<span class="doccomment">//!             let mut conf = rx.borrow().clone();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!             let mut op_start = Instant::now();</span>
-<span class="doccomment">//!             let mut delay = time::delay_until(op_start + conf.timeout);</span>
+<span class="doccomment">//!             let sleep = time::sleep_until(op_start + conf.timeout);</span>
+<span class="doccomment">//!             tokio::pin!(sleep);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!             loop {</span>
 <span class="doccomment">//!                 tokio::select! {</span>
-<span class="doccomment">//!                     _ = &amp;mut delay =&gt; {</span>
+<span class="doccomment">//!                     _ = &amp;mut sleep =&gt; {</span>
 <span class="doccomment">//!                         // The operation elapsed. Restart it</span>
 <span class="doccomment">//!                         op.set(my_async_operation());</span>
 <span class="doccomment">//!</span>
@@ -863,14 +867,14 @@
 <span class="doccomment">//!                         op_start = Instant::now();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!                         // Restart the timeout</span>
-<span class="doccomment">//!                         delay = time::delay_until(op_start + conf.timeout);</span>
+<span class="doccomment">//!                         sleep.set(time::sleep_until(op_start + conf.timeout));</span>
 <span class="doccomment">//!                     }</span>
-<span class="doccomment">//!                     new_conf = rx.recv() =&gt; {</span>
-<span class="doccomment">//!                         conf = new_conf.unwrap();</span>
+<span class="doccomment">//!                     _ = rx.changed() =&gt; {</span>
+<span class="doccomment">//!                         conf = rx.borrow().clone();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!                         // The configuration has been updated. Update the</span>
-<span class="doccomment">//!                         // `delay` using the new `timeout` value.</span>
-<span class="doccomment">//!                         delay.reset(op_start + conf.timeout);</span>
+<span class="doccomment">//!                         // `sleep` using the new `timeout` value.</span>
+<span class="doccomment">//!                         sleep.as_mut().reset(op_start + conf.timeout);</span>
 <span class="doccomment">//!                     }</span>
 <span class="doccomment">//!                     _ = &amp;mut op =&gt; {</span>
 <span class="doccomment">//!                         // The operation completed!</span>
@@ -896,7 +900,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The remaining synchronization primitives focus on synchronizing state.</span>
 <span class="doccomment">//! These are asynchronous equivalents to versions provided by `std`. They</span>
-<span class="doccomment">//! operate in a similar way as their `std` counterparts parts but will wait</span>
+<span class="doccomment">//! operate in a similar way as their `std` counterparts but will wait</span>
 <span class="doccomment">//! asynchronously instead of blocking the thread.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * [`Barrier`](Barrier) Ensures multiple tasks will wait for each other to</span>
@@ -924,23 +928,19 @@
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">broadcast</span>;
 
-    <span class="macro">cfg_unstable</span><span class="macro">!</span> {
-        <span class="kw">mod</span> <span class="ident">cancellation_token</span>;
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cancellation_token</span>::{<span class="ident">CancellationToken</span>, <span class="ident">WaitForCancellationFuture</span>};
-    }
-
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mpsc</span>;
 
     <span class="kw">mod</span> <span class="ident">mutex</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mutex</span>::{<span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>, <span class="ident">TryLockError</span>, <span class="ident">OwnedMutexGuard</span>};
 
-    <span class="kw">mod</span> <span class="ident">notify</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">notify</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">notify</span>::<span class="ident">Notify</span>;
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">oneshot</span>;
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">batch_semaphore</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">semaphore_ll</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">batch_semaphore</span>::{<span class="ident">AcquireError</span>, <span class="ident">TryAcquireError</span>};
+
     <span class="kw">mod</span> <span class="ident">semaphore</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">semaphore</span>::{<span class="ident">Semaphore</span>, <span class="ident">SemaphorePermit</span>, <span class="ident">OwnedSemaphorePermit</span>};
 
@@ -954,20 +954,30 @@
 }
 
 <span class="macro">cfg_not_sync</span><span class="macro">!</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fs&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>, <span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>)))]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">batch_semaphore</span>;
+
+    <span class="macro">cfg_fs</span><span class="macro">!</span> {
+        <span class="kw">mod</span> <span class="ident">mutex</span>;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mutex</span>::<span class="ident">Mutex</span>;
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>, <span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>)))]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">notify</span>;
+
     <span class="macro">cfg_atomic_waker_impl</span><span class="macro">!</span> {
         <span class="kw">mod</span> <span class="ident">task</span>;
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">task</span>::<span class="ident">AtomicWaker</span>;
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-            <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-core&quot;</span>,
+            <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>,
             <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>,
             <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">oneshot</span>;
 
-    <span class="macro">cfg_signal</span><span class="macro">!</span> {
+    <span class="macro">cfg_signal_internal</span><span class="macro">!</span> {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">mpsc</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">semaphore_ll</span>;
     }
 }
 

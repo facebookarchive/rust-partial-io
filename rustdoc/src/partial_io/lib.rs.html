@@ -152,8 +152,6 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -163,9 +161,6 @@
  */</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
-<span class="comment">// futures-rs 0.1.14 changed task::park() and unpark() to current() and</span>
-<span class="comment">// notify(), respectively. Keep using the old versions for compat.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 
 <span class="doccomment">//! Helpers for testing I/O behavior with partial, interrupted and blocking reads and writes.</span>
 <span class="doccomment">//!</span>
@@ -174,7 +169,7 @@
 <span class="doccomment">//! * `PartialRead` and `PartialWrite`, which wrap existing `Read` and</span>
 <span class="doccomment">//!   `Write` implementations and allow specifying arbitrary behavior on the</span>
 <span class="doccomment">//!   next `read`, `write` or `flush` call.</span>
-<span class="doccomment">//! * With the optional `futures03` and `tokio02` features, `PartialAsyncRead` and</span>
+<span class="doccomment">//! * With the optional `futures03` and `tokio1` features, `PartialAsyncRead` and</span>
 <span class="doccomment">//!   `PartialAsyncWrite` to wrap existing `AsyncRead` and `AsyncWrite`</span>
 <span class="doccomment">//!   implementations. These implementations are task-aware, so they will know</span>
 <span class="doccomment">//!   how to pause and unpause tasks if they return a `WouldBlock` error.</span>
@@ -191,7 +186,7 @@
 <span class="doccomment">//! * A partial read or write, even without an error, might leave the wrapper</span>
 <span class="doccomment">//!   in an invalid state ([example fix][1]).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio02`:</span>
+<span class="doccomment">//! With the `AsyncRead` and `AsyncWrite` provided by `futures03` and `tokio1`:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * A call to `read_to_end` or `write_all` within the wrapper might be partly</span>
 <span class="doccomment">//!   successful but then error out. These functions will return the error</span>
@@ -254,12 +249,13 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio1&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">async_read</span>::<span class="ident">tokio_impl</span>::<span class="ident">ReadBufExt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures03&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">async_read</span>::<span class="ident">PartialAsyncRead</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures03&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">async_write</span>::<span class="ident">PartialAsyncWrite</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">read</span>::<span class="ident">PartialRead</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">write</span>::<span class="ident">PartialWrite</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">read</span>::<span class="ident">PartialRead</span>, <span class="ident">write</span>::<span class="ident">PartialWrite</span>};
 
 <span class="doccomment">/// What to do the next time an IO operation is performed.</span>
 <span class="doccomment">///</span>

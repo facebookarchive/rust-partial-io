@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-0.5.6/src/buf/buf_mut.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_mut.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-1.0.1/src/buf/buf_mut.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_mut.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../bytes/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
@@ -1080,36 +1080,12 @@
 <span id="1077">1077</span>
 <span id="1078">1078</span>
 <span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cmp</span>,
-    <span class="ident">mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>},
-    <span class="ident">ptr</span>, <span class="ident">usize</span>,
-};
-
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">buf</span>::{<span class="ident">limit</span>, <span class="ident">Chain</span>, <span class="ident">Limit</span>, <span class="ident">UninitSlice</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">buf</span>::{<span class="ident">writer</span>, <span class="ident">Writer</span>};
+
+<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">cmp</span>, <span class="ident">mem</span>, <span class="ident">ptr</span>, <span class="ident">usize</span>};
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed</span>::<span class="ident">Box</span>, <span class="ident">vec</span>::<span class="ident">Vec</span>};
 
@@ -1133,12 +1109,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(buf, b&quot;hello world&quot;);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BufMut</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">BufMut</span> {
     <span class="doccomment">/// Returns the number of bytes that can be written from the current</span>
     <span class="doccomment">/// position until the end of the buffer is reached.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This value is greater than or equal to the length of the slice returned</span>
-    <span class="doccomment">/// by `bytes_mut`.</span>
+    <span class="doccomment">/// by `chunk_mut()`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1163,7 +1139,7 @@
 
     <span class="doccomment">/// Advance the internal cursor of the BufMut</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The next call to `bytes_mut` will return a slice starting `cnt` bytes</span>
+    <span class="doccomment">/// The next call to `chunk_mut` will return a slice starting `cnt` bytes</span>
     <span class="doccomment">/// further into the underlying buffer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is unsafe because there is no guarantee that the bytes</span>
@@ -1176,19 +1152,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut buf = Vec::with_capacity(16);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// unsafe {</span>
-    <span class="doccomment">///     // MaybeUninit::as_mut_ptr</span>
-    <span class="doccomment">///     buf.bytes_mut()[0].as_mut_ptr().write(b&#39;h&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[1].as_mut_ptr().write(b&#39;e&#39;);</span>
+    <span class="doccomment">/// // Write some data</span>
+    <span class="doccomment">/// buf.chunk_mut()[0..2].copy_from_slice(b&quot;he&quot;);</span>
+    <span class="doccomment">/// unsafe { buf.advance_mut(2) };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.advance_mut(2);</span>
+    <span class="doccomment">/// // write more bytes</span>
+    <span class="doccomment">/// buf.chunk_mut()[0..3].copy_from_slice(b&quot;llo&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.bytes_mut()[0].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[1].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[2].as_mut_ptr().write(b&#39;o&#39;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.advance_mut(3);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// unsafe { buf.advance_mut(3); }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(5, buf.len());</span>
     <span class="doccomment">/// assert_eq!(buf, b&quot;hello&quot;);</span>
@@ -1247,14 +1218,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// unsafe {</span>
     <span class="doccomment">///     // MaybeUninit::as_mut_ptr</span>
-    <span class="doccomment">///     buf.bytes_mut()[0].as_mut_ptr().write(b&#39;h&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[1].as_mut_ptr().write(b&#39;e&#39;);</span>
+    <span class="doccomment">///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;h&#39;);</span>
+    <span class="doccomment">///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;e&#39;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     buf.advance_mut(2);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.bytes_mut()[0].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[1].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.bytes_mut()[2].as_mut_ptr().write(b&#39;o&#39;);</span>
+    <span class="doccomment">///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;l&#39;);</span>
+    <span class="doccomment">///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;l&#39;);</span>
+    <span class="doccomment">///     buf.chunk_mut()[2..].as_mut_ptr().write(b&#39;o&#39;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     buf.advance_mut(3);</span>
     <span class="doccomment">/// }</span>
@@ -1265,54 +1236,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Implementer notes</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should never panic. `bytes_mut` should return an empty</span>
-    <span class="doccomment">/// slice **if and only if** `remaining_mut` returns 0. In other words,</span>
-    <span class="doccomment">/// `bytes_mut` returning an empty slice implies that `remaining_mut` will</span>
-    <span class="doccomment">/// return 0 and `remaining_mut` returning 0 implies that `bytes_mut` will</span>
+    <span class="doccomment">/// This function should never panic. `chunk_mut` should return an empty</span>
+    <span class="doccomment">/// slice **if and only if** `remaining_mut()` returns 0. In other words,</span>
+    <span class="doccomment">/// `chunk_mut()` returning an empty slice implies that `remaining_mut()` will</span>
+    <span class="doccomment">/// return 0 and `remaining_mut()` returning 0 implies that `chunk_mut()` will</span>
     <span class="doccomment">/// return an empty slice.</span>
-    <span class="kw">fn</span> <span class="ident">bytes_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>];
-
-    <span class="doccomment">/// Fills `dst` with potentially multiple mutable slices starting at `self`&#39;s</span>
-    <span class="doccomment">/// current position.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `BufMut` is backed by disjoint slices of bytes, `bytes_vectored_mut`</span>
-    <span class="doccomment">/// enables fetching more than one slice at once. `dst` is a slice of</span>
-    <span class="doccomment">/// mutable `IoSliceMut` references, enabling the slice to be directly used with</span>
-    <span class="doccomment">/// [`readv`] without any further conversion. The sum of the lengths of all</span>
-    <span class="doccomment">/// the buffers in `dst` will be less than or equal to</span>
-    <span class="doccomment">/// `Buf::remaining_mut()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The entries in `dst` will be overwritten, but the data **contained** by</span>
-    <span class="doccomment">/// the slices **will not** be modified. If `bytes_vectored_mut` does not fill every</span>
-    <span class="doccomment">/// entry in `dst`, then `dst` is guaranteed to contain all remaining slices</span>
-    <span class="doccomment">/// in `self.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a lower level function. Most operations are done with other</span>
-    <span class="doccomment">/// functions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Implementer notes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should never panic. Once the end of the buffer is reached,</span>
-    <span class="doccomment">/// i.e., `BufMut::remaining_mut` returns 0, calls to `bytes_vectored_mut` must</span>
-    <span class="doccomment">/// return 0 without mutating `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations should also take care to properly handle being called</span>
-    <span class="doccomment">/// with `dst` being a zero length slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`readv`]: http://man7.org/linux/man-pages/man2/readv.2.html</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">bytes_vectored_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="number">0</span>;
-        }
-
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_remaining_mut</span>() {
-            <span class="ident">dst</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">IoSliceMut</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">bytes_mut</span>());
-            <span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="number">0</span>
-        }
-    }
+    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UninitSlice</span>;
 
     <span class="doccomment">/// Transfer bytes into `self` from `src` and advance the cursor by the</span>
     <span class="doccomment">/// number of bytes written.</span>
@@ -1344,8 +1273,8 @@
             <span class="kw">let</span> <span class="ident">l</span>;
 
             <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">bytes</span>();
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes_mut</span>();
+                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">chunk</span>();
+                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunk_mut</span>();
                 <span class="ident">l</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">s</span>.<span class="ident">len</span>(), <span class="ident">d</span>.<span class="ident">len</span>());
 
                 <span class="ident">ptr</span>::<span class="ident">copy_nonoverlapping</span>(<span class="ident">s</span>.<span class="ident">as_ptr</span>(), <span class="ident">d</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">l</span>);
@@ -1391,7 +1320,7 @@
             <span class="kw">let</span> <span class="ident">cnt</span>;
 
             <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes_mut</span>();
+                <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunk_mut</span>();
                 <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">dst</span>.<span class="ident">len</span>(), <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">off</span>);
 
                 <span class="ident">ptr</span>::<span class="ident">copy_nonoverlapping</span>(<span class="ident">src</span>[<span class="ident">off</span>..].<span class="ident">as_ptr</span>(), <span class="ident">dst</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">cnt</span>);
@@ -1982,6 +1911,83 @@
     <span class="kw">fn</span> <span class="ident">put_f64_le</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class="ident">put_u64_le</span>(<span class="ident">n</span>.<span class="ident">to_bits</span>());
     }
+
+    <span class="doccomment">/// Creates an adaptor which can write at most `limit` bytes to `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use bytes::BufMut;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let arr = &amp;mut [0u8; 128][..];</span>
+    <span class="doccomment">/// assert_eq!(arr.remaining_mut(), 128);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let dst = arr.limit(10);</span>
+    <span class="doccomment">/// assert_eq!(dst.remaining_mut(), 10);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">limit</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Limit</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">limit</span>::<span class="ident">new</span>(<span class="self">self</span>, <span class="ident">limit</span>)
+    }
+
+    <span class="doccomment">/// Creates an adaptor which implements the `Write` trait for `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function returns a new value which implements `Write` by adapting</span>
+    <span class="doccomment">/// the `Write` trait functions to the `BufMut` trait functions. Given that</span>
+    <span class="doccomment">/// `BufMut` operations are infallible, none of the `Write` functions will</span>
+    <span class="doccomment">/// return with `Err`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use bytes::BufMut;</span>
+    <span class="doccomment">/// use std::io::Write;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buf = vec![].writer();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let num = buf.write(&amp;b&quot;hello world&quot;[..]).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(11, num);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buf = buf.into_inner();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(*buf, b&quot;hello world&quot;[..]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">writer</span>::<span class="ident">new</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Creates an adapter which will chain this buffer with another.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned `BufMut` instance will first write to all bytes from</span>
+    <span class="doccomment">/// `self`. Afterwards, it will write to `next`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use bytes::BufMut;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut a = [0u8; 5];</span>
+    <span class="doccomment">/// let mut b = [0u8; 6];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut chain = (&amp;mut a[..]).chain_mut(&amp;mut b[..]);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// chain.put_slice(b&quot;hello world&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(&amp;a[..], b&quot;hello&quot;);</span>
+    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot; world&quot;);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">chain_mut</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">BufMut</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">next</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Chain</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">U</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">Chain</span>::<span class="ident">new</span>(<span class="self">self</span>, <span class="ident">next</span>)
+    }
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">deref_forward_bufmut</span> {
@@ -1990,13 +1996,8 @@
             (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">remaining_mut</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">bytes_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">bytes_mut</span>()
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">bytes_vectored_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">bytes_vectored_mut</span>(<span class="ident">dst</span>)
+        <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UninitSlice</span> {
+            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">chunk_mut</span>()
         }
 
         <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">advance_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
@@ -2065,24 +2066,24 @@
     };
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
     <span class="macro">deref_forward_bufmut</span><span class="macro">!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="macro">deref_forward_bufmut</span><span class="macro">!</span>();
 }
 
-<span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
+<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">len</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bytes_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
-        <span class="comment">// MaybeUninit is repr(transparent), so safe to transmute</span>
-        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>) }
+    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UninitSlice</span> {
+        <span class="comment">// UninitSlice is repr(transparent), so safe to transmute</span>
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>) }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -2093,7 +2094,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="ident">usize</span>::<span class="ident">MAX</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>()
@@ -2115,9 +2116,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bytes_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
-        <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">slice</span>;
-
+    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UninitSlice</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">capacity</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="self">self</span>.<span class="ident">reserve</span>(<span class="number">64</span>); <span class="comment">// Grow the vec</span>
         }
@@ -2125,13 +2124,12 @@
         <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>();
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
 
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">cap</span>)[<span class="ident">len</span>..] }
+        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_ptr</span>();
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UninitSlice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">cap</span>)[<span class="ident">len</span>..] }
     }
 
     <span class="comment">// Specialize these methods so they can skip checking `remaining_mut`</span>
     <span class="comment">// and `advance_mut`.</span>
-
     <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="kw">super</span>::<span class="ident">Buf</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">src</span>: <span class="ident">T</span>)
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -2144,7 +2142,7 @@
 
             <span class="comment">// a block to contain the src.bytes() borrow</span>
             {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">bytes</span>();
+                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">chunk</span>();
                 <span class="ident">l</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>();
                 <span class="self">self</span>.<span class="ident">extend_from_slice</span>(<span class="ident">s</span>);
             }
@@ -2153,6 +2151,7 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
         <span class="self">self</span>.<span class="ident">extend_from_slice</span>(<span class="ident">src</span>);
     }
@@ -2161,46 +2160,5 @@
 <span class="comment">// The existence of this function makes the compiler catch if the BufMut</span>
 <span class="comment">// trait is &quot;object-safe&quot; or not.</span>
 <span class="kw">fn</span> <span class="ident">_assert_trait_object</span>(<span class="ident">_b</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">BufMut</span>) {}
-
-<span class="comment">// ===== impl IoSliceMut =====</span>
-
-<span class="doccomment">/// A buffer type used for `readv`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a wrapper around an `std::io::IoSliceMut`, but does not expose</span>
-<span class="doccomment">/// the inner bytes in a safe API, as they may point at uninitialized memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is `repr(transparent)` of the `std::io::IoSliceMut`, so it is valid to</span>
-<span class="doccomment">/// transmute them. However, as the memory might be uninitialized, care must be</span>
-<span class="doccomment">/// taken to not *read* the internal bytes, only *write* to them.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;IoSliceMut&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>())
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">IoSliceMut</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">IoSliceMut</span>::<span class="ident">new</span>(<span class="ident">buf</span>))
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">IoSliceMut</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">IoSliceMut</span>::<span class="ident">new</span>(<span class="kw">unsafe</span> {
-            <span class="comment">// We don&#39;t look at the contents, and `std::io::IoSliceMut`</span>
-            <span class="comment">// doesn&#39;t either.</span>
-            <span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>(<span class="ident">buf</span>)
-        }))
-    }
-}
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "bytes";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

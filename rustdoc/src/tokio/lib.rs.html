@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.24/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -438,14 +438,56 @@
 <span id="435">435</span>
 <span id="436">436</span>
 <span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio/0.2.24&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio/1.1.0&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(
     <span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>,
     <span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>,
-    <span class="ident">clippy</span>::<span class="ident">needless_doctest_main</span>,
-    <span class="ident">clippy</span>::<span class="ident">match_like_matches_macro</span>,
-    <span class="ident">clippy</span>::<span class="ident">stable_sort_primitive</span>
+    <span class="ident">clippy</span>::<span class="ident">needless_doctest_main</span>
 )]</span>
 <span class="attribute">#![<span class="ident">warn</span>(
     <span class="ident">missing_debug_implementations</span>,
@@ -460,14 +502,14 @@
 ))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 
-<span class="doccomment">//! A runtime for writing reliable, asynchronous, and slim applications.</span>
+<span class="doccomment">//! A runtime for writing reliable network applications without compromising speed.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tokio is an event-driven, non-blocking I/O platform for writing asynchronous</span>
 <span class="doccomment">//! applications with the Rust programming language. At a high level, it</span>
 <span class="doccomment">//! provides a few major components:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * Tools for [working with asynchronous tasks][tasks], including</span>
-<span class="doccomment">//!   [synchronization primitives and channels][sync] and [timeouts, delays, and</span>
+<span class="doccomment">//!   [synchronization primitives and channels][sync] and [timeouts, sleeps, and</span>
 <span class="doccomment">//!   intervals][time].</span>
 <span class="doccomment">//! * APIs for [performing asynchronous I/O][io], including [TCP and UDP][net] sockets,</span>
 <span class="doccomment">//!   [filesystem][fs] operations, and [process] and [signal] management.</span>
@@ -500,58 +542,8 @@
 <span class="doccomment">//! enabling the `full` feature flag:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! tokio = { version = &quot;0.2&quot;, features = [&quot;full&quot;] }</span>
+<span class="doccomment">//! tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Feature flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tokio uses a set of [feature flags] to reduce the amount of compiled code. It</span>
-<span class="doccomment">//! is possible to just enable certain features over others. By default, Tokio</span>
-<span class="doccomment">//! does not enable any features but allows one to enable a subset for their use</span>
-<span class="doccomment">//! case. Below is a list of the available feature flags. You may also notice</span>
-<span class="doccomment">//! above each function, struct and trait there is listed one or more feature flags</span>
-<span class="doccomment">//! that are required for that item to be used. If you are new to Tokio it is</span>
-<span class="doccomment">//! recommended that you use the `full` feature flag which will enable all public APIs.</span>
-<span class="doccomment">//! Beware though that this will pull in many extra dependencies that you may not</span>
-<span class="doccomment">//! need.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `full`: Enables all Tokio public API features listed below.</span>
-<span class="doccomment">//! - `rt-core`: Enables `tokio::spawn` and the basic (single-threaded) scheduler.</span>
-<span class="doccomment">//! - `rt-threaded`: Enables the heavier, multi-threaded, work-stealing scheduler.</span>
-<span class="doccomment">//! - `rt-util`: Enables non-scheduler utilities.</span>
-<span class="doccomment">//! - `io-driver`: Enables the `mio` based IO driver.</span>
-<span class="doccomment">//! - `io-util`: Enables the IO based `Ext` traits.</span>
-<span class="doccomment">//! - `io-std`: Enable `Stdout`, `Stdin` and `Stderr` types.</span>
-<span class="doccomment">//! - `net`: Enables `tokio::net` types such as `TcpStream`, `UnixStream` and `UdpSocket`.</span>
-<span class="doccomment">//! - `tcp`: Enables all `tokio::net::tcp` types.</span>
-<span class="doccomment">//! - `udp`: Enables all `tokio::net::udp` types.</span>
-<span class="doccomment">//! - `uds`: Enables all `tokio::net::unix` types.</span>
-<span class="doccomment">//! - `time`: Enables `tokio::time` types and allows the schedulers to enable</span>
-<span class="doccomment">//! the built in timer.</span>
-<span class="doccomment">//! - `process`: Enables `tokio::process` types.</span>
-<span class="doccomment">//! - `macros`: Enables `#[tokio::main]` and `#[tokio::test]` macros.</span>
-<span class="doccomment">//! - `sync`: Enables all `tokio::sync` types.</span>
-<span class="doccomment">//! - `stream`: Enables optional `Stream` implementations for types within Tokio.</span>
-<span class="doccomment">//! - `signal`: Enables all `tokio::signal` types.</span>
-<span class="doccomment">//! - `fs`: Enables `tokio::fs` types.</span>
-<span class="doccomment">//! - `dns`: Enables async `tokio::net::ToSocketAddrs`.</span>
-<span class="doccomment">//! - `test-util`: Enables testing based infrastructure for the Tokio runtime.</span>
-<span class="doccomment">//! - `blocking`: Enables `block_in_place` and `spawn_blocking`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! _Note: `AsyncRead` and `AsyncWrite` traits do not require any features and are</span>
-<span class="doccomment">//! always available._</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Internal features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These features do not expose any new API, but influence internal</span>
-<span class="doccomment">//! implementation aspects of Tokio, and can pull in additional</span>
-<span class="doccomment">//! dependencies. They are not included in `full`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `parking_lot`: As a potential optimization, use the _parking_lot_ crate&#39;s</span>
-<span class="doccomment">//! synchronization primitives internally. MSRV may increase according to the</span>
-<span class="doccomment">//! _parking_lot_ release in use.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [feature flags]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Authoring applications</span>
 <span class="doccomment">//!</span>
@@ -565,7 +557,7 @@
 <span class="doccomment">//! This example shows the quickest way to get started with Tokio.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! tokio = { version = &quot;0.2&quot;, features = [&quot;full&quot;] }</span>
+<span class="doccomment">//! tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Authoring libraries</span>
@@ -581,7 +573,7 @@
 <span class="doccomment">//! needs to `tokio::spawn` and use a `TcpStream`.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! tokio = { version = &quot;0.2&quot;, features = [&quot;rt-core&quot;, &quot;tcp&quot;] }</span>
+<span class="doccomment">//! tokio = { version = &quot;1&quot;, features = [&quot;rt&quot;, &quot;net&quot;] }</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Working With Tasks</span>
@@ -595,7 +587,7 @@
 <span class="doccomment">//! * Functions for [running blocking operations][blocking] in an asynchronous</span>
 <span class="doccomment">//!   task context.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The [`tokio::task`] module is present only when the &quot;rt-core&quot; feature flag</span>
+<span class="doccomment">//! The [`tokio::task`] module is present only when the &quot;rt&quot; feature flag</span>
 <span class="doccomment">//! is enabled.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [tasks]: task/index.html#what-are-tasks</span>
@@ -626,25 +618,26 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`tokio::time`] module provides utilities for tracking time and</span>
 <span class="doccomment">//! scheduling work. This includes functions for setting [timeouts][timeout] for</span>
-<span class="doccomment">//! tasks, [delaying][delay] work to run in the future, or [repeating an operation at an</span>
+<span class="doccomment">//! tasks, [sleeping][sleep] work to run in the future, or [repeating an operation at an</span>
 <span class="doccomment">//! interval][interval].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! In order to use `tokio::time`, the &quot;time&quot; feature flag must be enabled.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`tokio::time`]: crate::time</span>
-<span class="doccomment">//! [delay]: crate::time::delay_for()</span>
+<span class="doccomment">//! [sleep]: crate::time::sleep()</span>
 <span class="doccomment">//! [interval]: crate::time::interval()</span>
 <span class="doccomment">//! [timeout]: crate::time::timeout()</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Finally, Tokio provides a _runtime_ for executing asynchronous tasks. Most</span>
 <span class="doccomment">//! applications can use the [`#[tokio::main]`][main] macro to run their code on the</span>
-<span class="doccomment">//! Tokio runtime. In use-cases where manual control over the runtime is</span>
-<span class="doccomment">//! required, the [`tokio::runtime`] module provides APIs for configuring and</span>
-<span class="doccomment">//! managing runtimes.</span>
+<span class="doccomment">//! Tokio runtime. However, this macro provides only basic configuration options. As</span>
+<span class="doccomment">//! an alternative, the [`tokio::runtime`] module provides more powerful APIs for configuring</span>
+<span class="doccomment">//! and managing runtimes. You should use that module if the `#[tokio::main]` macro doesn&#39;t</span>
+<span class="doccomment">//! provide the functionality you need.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Using the runtime requires the &quot;rt-core&quot; or &quot;rt-threaded&quot; feature flags, to</span>
-<span class="doccomment">//! enable the basic [single-threaded scheduler][rt-core] and the [thread-pool</span>
-<span class="doccomment">//! scheduler][rt-threaded], respectively. See the [`runtime` module</span>
+<span class="doccomment">//! Using the runtime requires the &quot;rt&quot; or &quot;rt-multi-thread&quot; feature flags, to</span>
+<span class="doccomment">//! enable the basic [single-threaded scheduler][rt] and the [thread-pool</span>
+<span class="doccomment">//! scheduler][rt-multi-thread], respectively. See the [`runtime` module</span>
 <span class="doccomment">//! documentation][rt-features] for details. In addition, the &quot;macros&quot; feature</span>
 <span class="doccomment">//! flag enables the `#[tokio::main]` and `#[tokio::test]` attributes.</span>
 <span class="doccomment">//!</span>
@@ -652,8 +645,8 @@
 <span class="doccomment">//! [`tokio::runtime`]: crate::runtime</span>
 <span class="doccomment">//! [`Builder`]: crate::runtime::Builder</span>
 <span class="doccomment">//! [`Runtime`]: crate::runtime::Runtime</span>
-<span class="doccomment">//! [rt-core]: runtime/index.html#basic-scheduler</span>
-<span class="doccomment">//! [rt-threaded]: runtime/index.html#threaded-scheduler</span>
+<span class="doccomment">//! [rt]: runtime/index.html#basic-scheduler</span>
+<span class="doccomment">//! [rt-multi-thread]: runtime/index.html#threaded-scheduler</span>
 <span class="doccomment">//! [rt-features]: runtime/index.html#runtime-scheduler</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## CPU-bound tasks and blocking code</span>
@@ -665,16 +658,18 @@
 <span class="doccomment">//! combat this, Tokio provides two kinds of threads: Core threads and blocking</span>
 <span class="doccomment">//! threads. The core threads are where all asynchronous code runs, and Tokio</span>
 <span class="doccomment">//! will by default spawn one for each CPU core. The blocking threads are</span>
-<span class="doccomment">//! spawned on demand, and can be used to run blocking code that would otherwise</span>
-<span class="doccomment">//! block other tasks from running. Since it is not possible for Tokio to swap</span>
-<span class="doccomment">//! out blocking tasks, like it can do with asynchronous code, the upper limit</span>
-<span class="doccomment">//! on the number of blocking threads is very large. These limits can be</span>
-<span class="doccomment">//! configured on the [`Builder`].</span>
+<span class="doccomment">//! spawned on demand, can be used to run blocking code that would otherwise</span>
+<span class="doccomment">//! block other tasks from running and are kept alive when not used for a certain</span>
+<span class="doccomment">//! amount of time which can be configured with [`thread_keep_alive`].</span>
+<span class="doccomment">//! Since it is not possible for Tokio to swap out blocking tasks, like it</span>
+<span class="doccomment">//! can do with asynchronous code, the upper limit on the number of blocking</span>
+<span class="doccomment">//! threads is very large. These limits can be configured on the [`Builder`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! To spawn a blocking task, you should use the [`spawn_blocking`] function.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`Builder`]: crate::runtime::Builder</span>
 <span class="doccomment">//! [`spawn_blocking`]: crate::task::spawn_blocking()</span>
+<span class="doccomment">//! [`thread_keep_alive`]: crate::runtime::Builder::thread_keep_alive()</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! #[tokio::main]</span>
@@ -710,8 +705,7 @@
 <span class="doccomment">//! the [`AsyncRead`], [`AsyncWrite`], and [`AsyncBufRead`] traits. In addition,</span>
 <span class="doccomment">//! when the &quot;io-util&quot; feature flag is enabled, it also provides combinators and</span>
 <span class="doccomment">//! functions for working with these traits, forming as an asynchronous</span>
-<span class="doccomment">//! counterpart to [`std::io`]. When the &quot;io-driver&quot; feature flag is enabled, it</span>
-<span class="doccomment">//! also provides utilities for library authors implementing I/O resources.</span>
+<span class="doccomment">//! counterpart to [`std::io`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tokio also includes APIs for performing various kinds of I/O and interacting</span>
 <span class="doccomment">//! with the operating system asynchronously. These include:</span>
@@ -732,7 +726,7 @@
 <span class="doccomment">//! [`std::io`]: std::io</span>
 <span class="doccomment">//! [`tokio::net`]: crate::net</span>
 <span class="doccomment">//! [TCP]: crate::net::tcp</span>
-<span class="doccomment">//! [UDP]: crate::net::udp</span>
+<span class="doccomment">//! [UDP]: crate::net::UdpSocket</span>
 <span class="doccomment">//! [UDS]: crate::net::unix</span>
 <span class="doccomment">//! [`tokio::fs`]: crate::fs</span>
 <span class="doccomment">//! [`std::fs`]: std::fs</span>
@@ -745,11 +739,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use tokio::net::TcpListener;</span>
-<span class="doccomment">//! use tokio::prelude::*;</span>
+<span class="doccomment">//! use tokio::io::{AsyncReadExt, AsyncWriteExt};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! #[tokio::main]</span>
 <span class="doccomment">//! async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//!     let mut listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
+<span class="doccomment">//!     let listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     loop {</span>
 <span class="doccomment">//!         let (mut socket, _) = listener.accept().await?;</span>
@@ -779,6 +773,59 @@
 <span class="doccomment">//!     }</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Feature flags</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Tokio uses a set of [feature flags] to reduce the amount of compiled code. It</span>
+<span class="doccomment">//! is possible to just enable certain features over others. By default, Tokio</span>
+<span class="doccomment">//! does not enable any features but allows one to enable a subset for their use</span>
+<span class="doccomment">//! case. Below is a list of the available feature flags. You may also notice</span>
+<span class="doccomment">//! above each function, struct and trait there is listed one or more feature flags</span>
+<span class="doccomment">//! that are required for that item to be used. If you are new to Tokio it is</span>
+<span class="doccomment">//! recommended that you use the `full` feature flag which will enable all public APIs.</span>
+<span class="doccomment">//! Beware though that this will pull in many extra dependencies that you may not</span>
+<span class="doccomment">//! need.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `full`: Enables all Tokio public API features listed below except `test-util`.</span>
+<span class="doccomment">//! - `rt`: Enables `tokio::spawn`, the basic (current thread) scheduler,</span>
+<span class="doccomment">//!         and non-scheduler utilities.</span>
+<span class="doccomment">//! - `rt-multi-thread`: Enables the heavier, multi-threaded, work-stealing scheduler.</span>
+<span class="doccomment">//! - `io-util`: Enables the IO based `Ext` traits.</span>
+<span class="doccomment">//! - `io-std`: Enable `Stdout`, `Stdin` and `Stderr` types.</span>
+<span class="doccomment">//! - `net`: Enables `tokio::net` types such as `TcpStream`, `UnixStream` and `UdpSocket`,</span>
+<span class="doccomment">//!          as well as (on Unix-like systems) `AsyncFd`</span>
+<span class="doccomment">//! - `time`: Enables `tokio::time` types and allows the schedulers to enable</span>
+<span class="doccomment">//!           the built in timer.</span>
+<span class="doccomment">//! - `process`: Enables `tokio::process` types.</span>
+<span class="doccomment">//! - `macros`: Enables `#[tokio::main]` and `#[tokio::test]` macros.</span>
+<span class="doccomment">//! - `sync`: Enables all `tokio::sync` types.</span>
+<span class="doccomment">//! - `signal`: Enables all `tokio::signal` types.</span>
+<span class="doccomment">//! - `fs`: Enables `tokio::fs` types.</span>
+<span class="doccomment">//! - `test-util`: Enables testing based infrastructure for the Tokio runtime.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! _Note: `AsyncRead` and `AsyncWrite` traits do not require any features and are</span>
+<span class="doccomment">//! always available._</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Internal features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These features do not expose any new API, but influence internal</span>
+<span class="doccomment">//! implementation aspects of Tokio, and can pull in additional</span>
+<span class="doccomment">//! dependencies.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `parking_lot`: As a potential optimization, use the _parking_lot_ crate&#39;s</span>
+<span class="doccomment">//! synchronization primitives internally. MSRV may increase according to the</span>
+<span class="doccomment">//! _parking_lot_ release in use.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Unstable features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These feature flags enable **unstable** features. The public API may break in 1.x</span>
+<span class="doccomment">//! releases. To enable these features, the `--cfg tokio_unstable` must be passed to</span>
+<span class="doccomment">//! `rustc` when compiling. This is easiest done using the `RUSTFLAGS` env variable:</span>
+<span class="doccomment">//! `RUSTFLAGS=&quot;--cfg tokio_unstable&quot;`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `tracing`: Enables tracing events.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [feature flags]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section</span>
 
 <span class="comment">// Includes re-exports used by macros.</span>
 <span class="comment">//</span>
@@ -792,8 +839,7 @@
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fs</span>;
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">future</span>;
+<span class="kw">mod</span> <span class="ident">future</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">io</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">net</span>;
@@ -801,13 +847,16 @@
 <span class="kw">mod</span> <span class="ident">loom</span>;
 <span class="kw">mod</span> <span class="ident">park</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
-
 <span class="macro">cfg_process</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">process</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;net&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fs&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-std&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">blocking</span>;
+
+<span class="macro">cfg_rt</span><span class="macro">!</span> {
+    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
+}
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">coop</span>;
 
@@ -815,8 +864,11 @@
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">signal</span>;
 }
 
-<span class="macro">cfg_stream</span><span class="macro">!</span> {
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stream</span>;
+<span class="macro">cfg_signal_internal</span><span class="macro">!</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">signal</span>;
 }
 
 <span class="macro">cfg_sync</span><span class="macro">!</span> {
@@ -826,8 +878,8 @@
     <span class="kw">mod</span> <span class="ident">sync</span>;
 }
 
-<span class="macro">cfg_rt_core</span><span class="macro">!</span> {
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">task</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">task</span>;
+<span class="macro">cfg_rt</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">task</span>::<span class="ident">spawn</span>;
 }
 
@@ -837,6 +889,45 @@
 
 <span class="kw">mod</span> <span class="ident">util</span>;
 
+<span class="doccomment">/// Due to the `Stream` trait&#39;s inclusion in `std` landing later than Tokio&#39;s 1.0</span>
+<span class="doccomment">/// release, most of the Tokio stream utilities have been moved into the [`tokio-stream`]</span>
+<span class="doccomment">/// crate.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Why was `Stream` not included in Tokio 1.0?</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Originally, we had planned to ship Tokio 1.0 with a stable `Stream` type</span>
+<span class="doccomment">/// but unfortunetly the [RFC] had not been merged in time for `Stream` to</span>
+<span class="doccomment">/// reach `std` on a stable compiler in time for the 1.0 release of Tokio. For</span>
+<span class="doccomment">/// this reason, the team has decided to move all `Stream` based utilities to</span>
+<span class="doccomment">/// the [`tokio-stream`] crate. While this is not ideal, once `Stream` has made</span>
+<span class="doccomment">/// it into the standard library and the MSRV period has passed, we will implement</span>
+<span class="doccomment">/// stream for our different types.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// While this may seem unfortunate, not all is lost as you can get much of the</span>
+<span class="doccomment">/// `Stream` support with `async/await` and `while let` loops. It is also possible</span>
+<span class="doccomment">/// to create a `impl Stream` from `async fn` using the [`async-stream`] crate.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`tokio-stream`]: https://docs.rs/tokio-stream</span>
+<span class="doccomment">/// [`async-stream`]: https://docs.rs/async-stream</span>
+<span class="doccomment">/// [RFC]: https://github.com/rust-lang/rfcs/pull/2996</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Convert a [`sync::mpsc::Receiver`] to an `impl Stream`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use tokio::sync::mpsc;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let (tx, mut rx) = mpsc::channel::&lt;usize&gt;(16);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let stream = async_stream::stream! {</span>
+<span class="doccomment">///     while let Some(item) = rx.recv().await {</span>
+<span class="doccomment">///         yield item;</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// };</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stream</span> {}
+
 <span class="macro">cfg_macros</span><span class="macro">!</span> {
     <span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not**</span>
     <span class="doccomment">/// intended to be used as part of the public API and is permitted to</span>
@@ -844,31 +935,28 @@
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">select_priv_declare_output_enum</span>;
 
-    <span class="macro">doc_rt_core</span><span class="macro">!</span> {
-        <span class="macro">cfg_rt_threaded</span><span class="macro">!</span> {
-            <span class="comment">// This is the docs.rs case (with all features) so make sure macros</span>
-            <span class="comment">// is included in doc(cfg).</span>
+    <span class="macro">cfg_rt</span><span class="macro">!</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)))]</span>
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main</span>;
 
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)))]</span>
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test</span>;
+
+        <span class="macro">cfg_not_rt_multi_thread</span><span class="macro">!</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)))]</span>
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main_threaded</span> <span class="kw">as</span> <span class="ident">main</span>;
-
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)))]</span>
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test_threaded</span> <span class="kw">as</span> <span class="ident">test</span>;
-        }
-
-        <span class="macro">cfg_not_rt_threaded</span><span class="macro">!</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main_basic</span> <span class="kw">as</span> <span class="ident">main</span>;
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test_basic</span> <span class="kw">as</span> <span class="ident">test</span>;
+            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main_rt</span> <span class="kw">as</span> <span class="ident">main</span>;
+            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test_rt</span> <span class="kw">as</span> <span class="ident">test</span>;
         }
     }
 
-    <span class="comment">// Maintains old behavior</span>
-    <span class="macro">cfg_not_rt_core</span><span class="macro">!</span> {
+    <span class="comment">// Always fail if rt is not enabled.</span>
+    <span class="macro">cfg_not_rt</span><span class="macro">!</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main</span>;
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test</span>;
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main_fail</span> <span class="kw">as</span> <span class="ident">main</span>;
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test_fail</span> <span class="kw">as</span> <span class="ident">test</span>;
     }
 }
 

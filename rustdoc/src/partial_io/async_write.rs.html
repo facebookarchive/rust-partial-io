@@ -376,30 +376,6 @@
 <span id="373">373</span>
 <span id="374">374</span>
 <span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -417,8 +393,8 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">futures_util</span>::<span class="ident">FuturesOps</span>, <span class="ident">PartialOp</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">io</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">pin_project</span>::<span class="ident">pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">fmt</span>,
     <span class="ident">pin</span>::<span class="ident">Pin</span>,
     <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
 };
@@ -426,7 +402,7 @@
 <span class="doccomment">/// A wrapper that breaks inner `AsyncWrite` instances up according to the</span>
 <span class="doccomment">/// provided iterator.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Available with the `futures03` feature for `futures` traits, and with the `tokio02` feature for</span>
+<span class="doccomment">/// Available with the `futures03` feature for `futures` traits, and with the `tokio1` feature for</span>
 <span class="doccomment">/// `tokio` traits.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
@@ -434,14 +410,14 @@
 <span class="doccomment">/// This example uses `tokio`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio02&quot;)]</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;tokio1&quot;)]</span>
 <span class="doccomment">/// use partial_io::{PartialAsyncWrite, PartialOp};</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio02&quot;)]</span>
-<span class="doccomment">/// use std::io::Cursor;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio02&quot;)]</span>
-<span class="doccomment">/// use tokio::prelude::*;</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;tokio1&quot;)]</span>
+<span class="doccomment">/// use std::io::{self, Cursor};</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;tokio1&quot;)]</span>
+<span class="doccomment">/// use tokio::io::AsyncWriteExt;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio02&quot;)]</span>
+<span class="doccomment">/// # #[cfg(feature = &quot;tokio1&quot;)]</span>
 <span class="doccomment">/// #[tokio::main]</span>
 <span class="doccomment">/// async fn main() -&gt; io::Result&lt;()&gt; {</span>
 <span class="doccomment">///     let writer = Cursor::new(Vec::new());</span>
@@ -476,7 +452,7 @@
 <span class="doccomment">///     Ok(())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # #[cfg(not(feature = &quot;tokio02&quot;))]</span>
+<span class="doccomment">/// # #[cfg(not(feature = &quot;tokio1&quot;))]</span>
 <span class="doccomment">/// # fn main() {</span>
 <span class="doccomment">/// #     assert!(true, &quot;dummy test&quot;);</span>
 <span class="doccomment">/// # }</span>
@@ -648,18 +624,15 @@
 <span class="comment">// Tokio impls</span>
 <span class="comment">// ---</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio02&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio1&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tokio_impl</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">PartialAsyncWrite</span>;
-    <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">BufMut</span>;
     <span class="kw">use</span> <span class="ident">std</span>::{
-        <span class="ident">io</span>::<span class="ident">SeekFrom</span>,
-        <span class="ident">mem</span>::<span class="ident">MaybeUninit</span>,
+        <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">SeekFrom</span>},
         <span class="ident">pin</span>::<span class="ident">Pin</span>,
         <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
     };
-    <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">AsyncSeek</span>;
-    <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">io</span>::{<span class="ident">AsyncBufRead</span>, <span class="ident">AsyncRead</span>, <span class="ident">AsyncSeek</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">PartialAsyncWrite</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -716,26 +689,9 @@
         <span class="kw">fn</span> <span class="ident">poll_read</span>(
             <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
             <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">prepare_uninitialized_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">prepare_uninitialized_buffer</span>(<span class="ident">buf</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">poll_read_buf</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BufMut</span><span class="op">&gt;</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="self">Self</span>: <span class="ident">Sized</span>,
-        {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_read_buf</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
         }
     }
 
@@ -761,12 +717,8 @@
         <span class="ident">W</span>: <span class="ident">AsyncSeek</span>,
     {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">start_seek</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">position</span>: <span class="ident">SeekFrom</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">start_seek</span>(<span class="ident">cx</span>, <span class="ident">position</span>)
+        <span class="kw">fn</span> <span class="ident">start_seek</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">SeekFrom</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">start_seek</span>(<span class="ident">position</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>

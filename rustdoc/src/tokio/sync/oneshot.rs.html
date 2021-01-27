@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.24/src/sync/oneshot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oneshot.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.1.0/src/sync/oneshot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oneshot.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -796,6 +796,44 @@
 <span id="793">793</span>
 <span id="794">794</span>
 <span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unreachable_pub</span>))]</span>
 
@@ -923,7 +961,6 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Inner</span> {
         <span class="ident">state</span>: <span class="ident">AtomicUsize</span>::<span class="ident">new</span>(<span class="ident">State</span>::<span class="ident">new</span>().<span class="ident">as_usize</span>()),
         <span class="ident">value</span>: <span class="ident">UnsafeCell</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>),
@@ -996,55 +1033,6 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span> <span class="comment">// TODO: remove</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// Keep track of task budget</span>
-        <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready</span><span class="macro">!</span>(<span class="kw">crate</span>::<span class="ident">coop</span>::<span class="ident">poll_proceed</span>(<span class="ident">cx</span>));
-
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>, <span class="ident">Acquire</span>);
-
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
-            <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(());
-        }
-
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_tx_task_set</span>() {
-            <span class="kw">let</span> <span class="ident">will_notify</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">inner</span>.<span class="ident">with_tx_task</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">will_wake</span>(<span class="ident">cx</span>.<span class="ident">waker</span>())) };
-
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">will_notify</span> {
-                <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">unset_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
-
-                <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
-                    <span class="comment">// Set the flag again so that the waker is released in drop</span>
-                    <span class="ident">State</span>::<span class="ident">set_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
-                    <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-                    <span class="kw">return</span> <span class="ident">Ready</span>(());
-                } <span class="kw">else</span> {
-                    <span class="kw">unsafe</span> { <span class="ident">inner</span>.<span class="ident">drop_tx_task</span>() };
-                }
-            }
-        }
-
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">is_tx_task_set</span>() {
-            <span class="comment">// Attempt to set the task</span>
-            <span class="kw">unsafe</span> {
-                <span class="ident">inner</span>.<span class="ident">set_tx_task</span>(<span class="ident">cx</span>);
-            }
-
-            <span class="comment">// Update the state</span>
-            <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">set_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
-
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
-                <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-                <span class="kw">return</span> <span class="ident">Ready</span>(());
-            }
-        }
-
-        <span class="ident">Pending</span>
-    }
-
     <span class="doccomment">/// Waits for the associated [`Receiver`] handle to close.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A [`Receiver`] is closed by either calling [`close`] explicitly or the</span>
@@ -1086,8 +1074,6 @@
     <span class="doccomment">/// use tokio::sync::oneshot;</span>
     <span class="doccomment">/// use tokio::time::{self, Duration};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// use futures::{select, FutureExt};</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// async fn compute() -&gt; String {</span>
     <span class="doccomment">///     // Complex computation returning a `String`</span>
     <span class="doccomment">/// # &quot;hello&quot;.to_string()</span>
@@ -1098,12 +1084,14 @@
     <span class="doccomment">///     let (mut tx, rx) = oneshot::channel();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     tokio::spawn(async move {</span>
-    <span class="doccomment">///         select! {</span>
-    <span class="doccomment">///             _ = tx.closed().fuse() =&gt; {</span>
+    <span class="doccomment">///         tokio::select! {</span>
+    <span class="doccomment">///             _ = tx.closed() =&gt; {</span>
     <span class="doccomment">///                 // The receiver dropped, no need to do any further work</span>
     <span class="doccomment">///             }</span>
-    <span class="doccomment">///             value = compute().fuse() =&gt; {</span>
-    <span class="doccomment">///                 tx.send(value).unwrap()</span>
+    <span class="doccomment">///             value = compute() =&gt; {</span>
+    <span class="doccomment">///                 // The send can fail if the channel was closed at the exact same</span>
+    <span class="doccomment">///                 // time as when compute() finished, so just ignore the failure.</span>
+    <span class="doccomment">///                 let _ = tx.send(value);</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     });</span>
@@ -1150,6 +1138,94 @@
 
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>, <span class="ident">Acquire</span>);
         <span class="ident">state</span>.<span class="ident">is_closed</span>()
+    }
+
+    <span class="doccomment">/// Check whether the oneshot channel has been closed, and if not, schedules the</span>
+    <span class="doccomment">/// `Waker` in the provided `Context` to receive a notification when the channel is</span>
+    <span class="doccomment">/// closed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A [`Receiver`] is closed by either calling [`close`] explicitly, or when the</span>
+    <span class="doccomment">/// [`Receiver`] value is dropped.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that on multiple calls to poll, only the `Waker` from the `Context` passed</span>
+    <span class="doccomment">/// to the most recent call will be scheduled to receive a wakeup.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Receiver`]: struct@crate::sync::oneshot::Receiver</span>
+    <span class="doccomment">/// [`close`]: fn@crate::sync::oneshot::Receiver::close</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Return value</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function returns:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///  * `Poll::Pending` if the channel is still open.</span>
+    <span class="doccomment">///  * `Poll::Ready(())` if the channel is closed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::sync::oneshot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// use futures::future::poll_fn;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// #[tokio::main]</span>
+    <span class="doccomment">/// async fn main() {</span>
+    <span class="doccomment">///     let (mut tx, mut rx) = oneshot::channel::&lt;()&gt;();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     tokio::spawn(async move {</span>
+    <span class="doccomment">///         rx.close();</span>
+    <span class="doccomment">///     });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     poll_fn(|cx| tx.poll_closed(cx)).await;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     println!(&quot;the receiver dropped&quot;);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="comment">// Keep track of task budget</span>
+        <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready</span><span class="macro">!</span>(<span class="kw">crate</span>::<span class="ident">coop</span>::<span class="ident">poll_proceed</span>(<span class="ident">cx</span>));
+
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>, <span class="ident">Acquire</span>);
+
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
+            <span class="ident">coop</span>.<span class="ident">made_progress</span>();
+            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(());
+        }
+
+        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_tx_task_set</span>() {
+            <span class="kw">let</span> <span class="ident">will_notify</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">inner</span>.<span class="ident">with_tx_task</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">will_wake</span>(<span class="ident">cx</span>.<span class="ident">waker</span>())) };
+
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">will_notify</span> {
+                <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">unset_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
+
+                <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
+                    <span class="comment">// Set the flag again so that the waker is released in drop</span>
+                    <span class="ident">State</span>::<span class="ident">set_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
+                    <span class="ident">coop</span>.<span class="ident">made_progress</span>();
+                    <span class="kw">return</span> <span class="ident">Ready</span>(());
+                } <span class="kw">else</span> {
+                    <span class="kw">unsafe</span> { <span class="ident">inner</span>.<span class="ident">drop_tx_task</span>() };
+                }
+            }
+        }
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">is_tx_task_set</span>() {
+            <span class="comment">// Attempt to set the task</span>
+            <span class="kw">unsafe</span> {
+                <span class="ident">inner</span>.<span class="ident">set_tx_task</span>(<span class="ident">cx</span>);
+            }
+
+            <span class="comment">// Update the state</span>
+            <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">set_tx_task</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>);
+
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
+                <span class="ident">coop</span>.<span class="ident">made_progress</span>();
+                <span class="kw">return</span> <span class="ident">Ready</span>(());
+            }
+        }
+
+        <span class="ident">Pending</span>
     }
 }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.24/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.1.0/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -523,27 +523,53 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::<span class="ident">handle</span>::<span class="ident">Handle</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::<span class="ident">shell</span>::<span class="ident">Shell</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::{<span class="ident">blocking</span>, <span class="ident">io</span>, <span class="ident">time</span>, <span class="ident">Callback</span>, <span class="ident">Runtime</span>, <span class="ident">Spawner</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::{<span class="ident">blocking</span>, <span class="ident">driver</span>, <span class="ident">Callback</span>, <span class="ident">Runtime</span>, <span class="ident">Spawner</span>};
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="doccomment">/// Builds Tokio Runtime with custom configuration values.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Methods can be chained in order to set the configuration values. The</span>
 <span class="doccomment">/// Runtime is constructed by calling [`build`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// New instances of `Builder` are obtained via [`Builder::new`].</span>
+<span class="doccomment">/// New instances of `Builder` are obtained via [`Builder::new_multi_thread`]</span>
+<span class="doccomment">/// or [`Builder::new_current_thread`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See function level documentation for details on the various configuration</span>
 <span class="doccomment">/// settings.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`build`]: method@Self::build</span>
-<span class="doccomment">/// [`Builder::new`]: method@Self::new</span>
+<span class="doccomment">/// [`Builder::new_multi_thread`]: method@Self::new_multi_thread</span>
+<span class="doccomment">/// [`Builder::new_current_thread`]: method@Self::new_current_thread</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -552,9 +578,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// fn main() {</span>
 <span class="doccomment">///     // build runtime</span>
-<span class="doccomment">///     let runtime = Builder::new()</span>
-<span class="doccomment">///         .threaded_scheduler()</span>
-<span class="doccomment">///         .core_threads(4)</span>
+<span class="doccomment">///     let runtime = Builder::new_multi_thread()</span>
+<span class="doccomment">///         .worker_threads(4)</span>
 <span class="doccomment">///         .thread_name(&quot;my-custom-name&quot;)</span>
 <span class="doccomment">///         .thread_stack_size(3 * 1024 * 1024)</span>
 <span class="doccomment">///         .build()</span>
@@ -564,7 +589,7 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// The task execution model to use.</span>
+    <span class="doccomment">/// Runtime type</span>
     <span class="ident">kind</span>: <span class="ident">Kind</span>,
 
     <span class="doccomment">/// Whether or not to enable the I/O driver</span>
@@ -576,13 +601,13 @@
     <span class="doccomment">/// The number of worker threads, used by Runtime.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only used when not using the current-thread executor.</span>
-    <span class="ident">core_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Cap on thread usage.</span>
-    <span class="ident">max_threads</span>: <span class="ident">usize</span>,
+    <span class="ident">max_blocking_threads</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// Name used for threads spawned by the runtime.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">thread_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Name fn used for threads spawned by the runtime.</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">thread_name</span>: <span class="ident">ThreadNameFn</span>,
 
     <span class="doccomment">/// Stack size used for threads spawned by the runtime.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">thread_stack_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -592,26 +617,43 @@
 
     <span class="doccomment">/// To run before each worker thread stops</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">before_stop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Callback</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Customizable keep alive timeout for BlockingPool</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">keep_alive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="ident">Shell</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-core&quot;</span>)]</span>
-    <span class="ident">Basic</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-threaded&quot;</span>)]</span>
-    <span class="ident">ThreadPool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ThreadNameFn</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Kind</span> {
+    <span class="ident">CurrentThread</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+    <span class="ident">MultiThread</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Builder</span> {
+    <span class="doccomment">/// Returns a new builder with the current thread scheduler selected.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_current_thread</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span> {
+        <span class="ident">Builder</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">CurrentThread</span>)
+    }
+
+    <span class="doccomment">/// Returns a new builder with the multi thread scheduler selected.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_multi_thread</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span> {
+        <span class="ident">Builder</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">MultiThread</span>)
+    }
+
     <span class="doccomment">/// Returns a new runtime builder initialized with default configuration</span>
     <span class="doccomment">/// values.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span> {
         <span class="ident">Builder</span> {
-            <span class="comment">// No task execution by default</span>
-            <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">Shell</span>,
+            <span class="ident">kind</span>,
 
             <span class="comment">// I/O defaults to &quot;off&quot;</span>
             <span class="ident">enable_io</span>: <span class="bool-val">false</span>,
@@ -620,12 +662,12 @@
             <span class="ident">enable_time</span>: <span class="bool-val">false</span>,
 
             <span class="comment">// Default to lazy auto-detection (one thread per CPU core)</span>
-            <span class="ident">core_threads</span>: <span class="prelude-val">None</span>,
+            <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
 
-            <span class="ident">max_threads</span>: <span class="number">512</span>,
+            <span class="ident">max_blocking_threads</span>: <span class="number">512</span>,
 
             <span class="comment">// Default thread name</span>
-            <span class="ident">thread_name</span>: <span class="string">&quot;tokio-runtime-worker&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">thread_name</span>: <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;tokio-runtime-worker&quot;</span>.<span class="ident">into</span>()),
 
             <span class="comment">// Do not set a stack size by default</span>
             <span class="ident">thread_stack_size</span>: <span class="prelude-val">None</span>,
@@ -633,6 +675,8 @@
             <span class="comment">// No worker thread callbacks</span>
             <span class="ident">after_start</span>: <span class="prelude-val">None</span>,
             <span class="ident">before_stop</span>: <span class="prelude-val">None</span>,
+
+            <span class="ident">keep_alive</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -647,14 +691,13 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use tokio::runtime;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new()</span>
-    <span class="doccomment">///     .threaded_scheduler()</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .enable_all()</span>
     <span class="doccomment">///     .build()</span>
     <span class="doccomment">///     .unwrap();</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-driver&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;net&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>, <span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>)))]</span>
         <span class="self">self</span>.<span class="ident">enable_io</span>();
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
         <span class="self">self</span>.<span class="ident">enable_time</span>();
@@ -662,61 +705,77 @@
         <span class="self">self</span>
     }
 
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;In future will be replaced by core_threads method&quot;</span>)]</span>
-    <span class="doccomment">/// Sets the maximum number of worker threads for the `Runtime`&#39;s thread pool.</span>
+    <span class="doccomment">/// Sets the number of worker threads the `Runtime` will use.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This must be a number between 1 and 32,768 though it is advised to keep</span>
-    <span class="doccomment">/// this value on the smaller side.</span>
+    <span class="doccomment">/// This should be a number between 0 and 32,768 though it is advised to</span>
+    <span class="doccomment">/// keep this value on the smaller side.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is the number of cores available to the system.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_threads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">core_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets the core number of worker threads for the `Runtime`&#39;s thread pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be a number between 1 and 32,768 though it is advised to keep</span>
-    <span class="doccomment">/// this value on the smaller side.</span>
+    <span class="doccomment">/// # Default</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is the number of cores available to the system.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// These threads will be always active and running.</span>
+    <span class="doccomment">/// # Panic</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When using the `current_thread` runtime this method will panic, since</span>
+    <span class="doccomment">/// those variants do not allow setting worker thread counts.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Multi threaded runtime with 4 threads</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use tokio::runtime;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new()</span>
-    <span class="doccomment">///     .threaded_scheduler()</span>
-    <span class="doccomment">///     .core_threads(4)</span>
+    <span class="doccomment">/// // This will spawn a work-stealing runtime with 4 worker threads.</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
+    <span class="doccomment">///     .worker_threads(4)</span>
     <span class="doccomment">///     .build()</span>
     <span class="doccomment">///     .unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// rt.spawn(async move {});</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">core_threads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">val</span>, <span class="number">0</span>, <span class="string">&quot;Core threads cannot be zero&quot;</span>);
-        <span class="self">self</span>.<span class="ident">core_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Current thread runtime (will only run on the current thread via `Runtime::block_on`)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use tokio::runtime;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Create a runtime that _must_ be driven from a call</span>
+    <span class="doccomment">/// // to `Runtime::block_on`.</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
+    <span class="doccomment">///     .build()</span>
+    <span class="doccomment">///     .unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // This will run the runtime and future on the current thread</span>
+    <span class="doccomment">/// rt.block_on(async move {});</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panic</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will panic if `val` is not larger than `0`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">worker_threads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">val</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Worker threads cannot be set to 0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">worker_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specifies limit for threads, spawned by the Runtime.</span>
+    <span class="doccomment">/// Specifies limit for threads spawned by the Runtime used for blocking operations.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is number of threads to be used by Runtime, including `core_threads`</span>
-    <span class="doccomment">/// Having `max_threads` less than `core_threads` results in invalid configuration</span>
-    <span class="doccomment">/// when building multi-threaded `Runtime`, which would cause a panic.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Similarly to the `core_threads`, this number should be between 1 and 32,768.</span>
+    <span class="doccomment">/// Similarly to the `worker_threads`, this number should be between 1 and 32,768.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 512.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When multi-threaded runtime is not used, will act as limit on additional threads.</span>
+    <span class="doccomment">/// Otherwise as `worker_threads` are always active, it limits additional threads (e.g. for</span>
+    <span class="doccomment">/// blocking annotations).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise as `core_threads` are always active, it limits additional threads (e.g. for</span>
-    <span class="doccomment">/// blocking annotations) as `max_threads - core_threads`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_threads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">val</span>, <span class="number">0</span>, <span class="string">&quot;Thread limit cannot be zero&quot;</span>);
-        <span class="self">self</span>.<span class="ident">max_threads</span> <span class="op">=</span> <span class="ident">val</span>;
+    <span class="doccomment">/// # Panic</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will panic if `val` is not larger than `0`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_blocking_threads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">val</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Max blocking threads cannot be set to 0&quot;</span>);
+        <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
@@ -730,13 +789,42 @@
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new()</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .thread_name(&quot;my-pool&quot;)</span>
     <span class="doccomment">///     .build();</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_name</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">thread_name</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into</span>();
+        <span class="self">self</span>.<span class="ident">thread_name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets a function used to generate the name of threads spawned by the `Runtime`&#39;s thread pool.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default name fn is `|| &quot;tokio-runtime-worker&quot;.into()`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use tokio::runtime;</span>
+    <span class="doccomment">/// # use std::sync::atomic::{AtomicUsize, Ordering};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # pub fn main() {</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
+    <span class="doccomment">///     .thread_name_fn(|| {</span>
+    <span class="doccomment">///        static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);</span>
+    <span class="doccomment">///        let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);</span>
+    <span class="doccomment">///        format!(&quot;my-pool-{}&quot;, id)</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .build();</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_name_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="self">self</span>.<span class="ident">thread_name</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">f</span>);
         <span class="self">self</span>
     }
 
@@ -754,8 +842,7 @@
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new()</span>
-    <span class="doccomment">///     .threaded_scheduler()</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .thread_stack_size(32 * 1024)</span>
     <span class="doccomment">///     .build();</span>
     <span class="doccomment">/// # }</span>
@@ -776,8 +863,7 @@
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new()</span>
-    <span class="doccomment">///     .threaded_scheduler()</span>
+    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .on_thread_start(|| {</span>
     <span class="doccomment">///         println!(&quot;thread started&quot;);</span>
     <span class="doccomment">///     })</span>
@@ -789,7 +875,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">after_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">f</span>));
+        <span class="self">self</span>.<span class="ident">after_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">f</span>));
         <span class="self">self</span>
     }
 
@@ -803,8 +889,7 @@
     <span class="doccomment">/// # use tokio::runtime;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new()</span>
-    <span class="doccomment">///     .threaded_scheduler()</span>
+    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
     <span class="doccomment">///     .on_thread_stop(|| {</span>
     <span class="doccomment">///         println!(&quot;thread stopping&quot;);</span>
     <span class="doccomment">///     })</span>
@@ -816,56 +901,91 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">before_stop</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">f</span>));
+        <span class="self">self</span>.<span class="ident">before_stop</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">f</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Creates the configured `Runtime`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `ThreadPool` instance is ready to spawn tasks.</span>
+    <span class="doccomment">/// The returned `Runtime` instance is ready to spawn tasks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use tokio::runtime::Builder;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut rt = Builder::new().build().unwrap();</span>
+    <span class="doccomment">/// let rt  = Builder::new_multi_thread().build().unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// rt.block_on(async {</span>
     <span class="doccomment">///     println!(&quot;Hello from the Tokio runtime&quot;);</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind</span>::<span class="ident">Shell</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">build_shell_runtime</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-core&quot;</span>)]</span>
-            <span class="ident">Kind</span>::<span class="ident">Basic</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">build_basic_runtime</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-threaded&quot;</span>)]</span>
-            <span class="ident">Kind</span>::<span class="ident">ThreadPool</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">build_threaded_runtime</span>(),
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span> {
+            <span class="ident">Kind</span>::<span class="ident">CurrentThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">build_basic_runtime</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+            <span class="ident">Kind</span>::<span class="ident">MultiThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">build_threaded_runtime</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">build_shell_runtime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::<span class="ident">Kind</span>;
+    <span class="kw">fn</span> <span class="ident">get_cfg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">driver</span>::<span class="ident">Cfg</span> {
+        <span class="ident">driver</span>::<span class="ident">Cfg</span> {
+            <span class="ident">enable_pause_time</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
+                <span class="ident">Kind</span>::<span class="ident">CurrentThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+                <span class="ident">Kind</span>::<span class="ident">MultiThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            },
+            <span class="ident">enable_io</span>: <span class="self">self</span>.<span class="ident">enable_io</span>,
+            <span class="ident">enable_time</span>: <span class="self">self</span>.<span class="ident">enable_time</span>,
+        }
+    }
 
-        <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_clock</span>();
+    <span class="doccomment">/// Sets a custom timeout for a thread in the blocking pool.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By default, the timeout for a thread is set to 10 seconds. This can</span>
+    <span class="doccomment">/// be overriden using .thread_keep_alive().</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use tokio::runtime;</span>
+    <span class="doccomment">/// # use std::time::Duration;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # pub fn main() {</span>
+    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
+    <span class="doccomment">///     .thread_keep_alive(Duration::from_millis(100))</span>
+    <span class="doccomment">///     .build();</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">keep_alive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>);
+        <span class="self">self</span>
+    }
 
-        <span class="comment">// Create I/O driver</span>
-        <span class="kw">let</span> (<span class="ident">io_driver</span>, <span class="ident">io_handle</span>) <span class="op">=</span> <span class="ident">io</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_io</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">time_handle</span>) <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_time</span>, <span class="ident">io_driver</span>, <span class="ident">clock</span>.<span class="ident">clone</span>());
+    <span class="kw">fn</span> <span class="ident">build_basic_runtime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::{<span class="ident">BasicScheduler</span>, <span class="ident">Kind</span>};
 
-        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span>::<span class="ident">Shell</span>;
+        <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver</span>::<span class="ident">Driver</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking</span>::<span class="ident">create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_threads</span>);
+        <span class="comment">// And now put a single-threaded scheduler on top of the timer. When</span>
+        <span class="comment">// there are no futures ready to do something, it&#39;ll let the timer or</span>
+        <span class="comment">// the reactor to generate some new stimuli for the futures to continue</span>
+        <span class="comment">// in their life.</span>
+        <span class="kw">let</span> <span class="ident">scheduler</span> <span class="op">=</span> <span class="ident">BasicScheduler</span>::<span class="ident">new</span>(<span class="ident">driver</span>);
+        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span>::<span class="ident">Basic</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
+
+        <span class="comment">// Blocking pool</span>
+        <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking</span>::<span class="ident">create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span>);
         <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
-            <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">Shell</span>(<span class="ident">Shell</span>::<span class="ident">new</span>(<span class="ident">driver</span>)),
+            <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">CurrentThread</span>(<span class="ident">scheduler</span>),
             <span class="ident">handle</span>: <span class="ident">Handle</span> {
                 <span class="ident">spawner</span>,
-                <span class="ident">io_handle</span>,
-                <span class="ident">time_handle</span>,
-                <span class="ident">clock</span>,
+                <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
+                <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
+                <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
+                <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
                 <span class="ident">blocking_spawner</span>,
             },
             <span class="ident">blocking_pool</span>,
@@ -885,7 +1005,7 @@
         <span class="doccomment">/// ```</span>
         <span class="doccomment">/// use tokio::runtime;</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new()</span>
+        <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
         <span class="doccomment">///     .enable_io()</span>
         <span class="doccomment">///     .build()</span>
         <span class="doccomment">///     .unwrap();</span>
@@ -908,7 +1028,7 @@
         <span class="doccomment">/// ```</span>
         <span class="doccomment">/// use tokio::runtime;</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new()</span>
+        <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
         <span class="doccomment">///     .enable_time()</span>
         <span class="doccomment">///     .build()</span>
         <span class="doccomment">///     .unwrap();</span>
@@ -920,103 +1040,37 @@
     }
 }
 
-<span class="macro">cfg_rt_core</span><span class="macro">!</span> {
+<span class="macro">cfg_rt_multi_thread</span><span class="macro">!</span> {
     <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="doccomment">/// Sets runtime to use a simpler scheduler that runs all tasks on the current-thread.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The executor and all necessary drivers will all be run on the current</span>
-        <span class="doccomment">/// thread during [`block_on`] calls.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// See also [the module level documentation][1], which has a section on scheduler</span>
-        <span class="doccomment">/// types.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [1]: index.html#runtime-configurations</span>
-        <span class="doccomment">/// [`block_on`]: Runtime::block_on</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic_scheduler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">Kind</span>::<span class="ident">Basic</span>;
-            <span class="self">self</span>
-        }
-
-        <span class="kw">fn</span> <span class="ident">build_basic_runtime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-            <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::{<span class="ident">BasicScheduler</span>, <span class="ident">Kind</span>};
-
-            <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_clock</span>();
-
-            <span class="comment">// Create I/O driver</span>
-            <span class="kw">let</span> (<span class="ident">io_driver</span>, <span class="ident">io_handle</span>) <span class="op">=</span> <span class="ident">io</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_io</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">time_handle</span>) <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_time</span>, <span class="ident">io_driver</span>, <span class="ident">clock</span>.<span class="ident">clone</span>());
-
-            <span class="comment">// And now put a single-threaded scheduler on top of the timer. When</span>
-            <span class="comment">// there are no futures ready to do something, it&#39;ll let the timer or</span>
-            <span class="comment">// the reactor to generate some new stimuli for the futures to continue</span>
-            <span class="comment">// in their life.</span>
-            <span class="kw">let</span> <span class="ident">scheduler</span> <span class="op">=</span> <span class="ident">BasicScheduler</span>::<span class="ident">new</span>(<span class="ident">driver</span>);
-            <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span>::<span class="ident">Basic</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
-
-            <span class="comment">// Blocking pool</span>
-            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking</span>::<span class="ident">create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_threads</span>);
-            <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
-
-            <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
-                <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">Basic</span>(<span class="ident">scheduler</span>),
-                <span class="ident">handle</span>: <span class="ident">Handle</span> {
-                    <span class="ident">spawner</span>,
-                    <span class="ident">io_handle</span>,
-                    <span class="ident">time_handle</span>,
-                    <span class="ident">clock</span>,
-                    <span class="ident">blocking_spawner</span>,
-                },
-                <span class="ident">blocking_pool</span>,
-            })
-        }
-    }
-}
-
-<span class="macro">cfg_rt_threaded</span><span class="macro">!</span> {
-    <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="doccomment">/// Sets runtime to use a multi-threaded scheduler for executing tasks.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// See also [the module level documentation][1], which has a section on scheduler</span>
-        <span class="doccomment">/// types.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [1]: index.html#runtime-configurations</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">threaded_scheduler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">Kind</span>::<span class="ident">ThreadPool</span>;
-            <span class="self">self</span>
-        }
-
         <span class="kw">fn</span> <span class="ident">build_threaded_runtime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">loom</span>::<span class="ident">sys</span>::<span class="ident">num_cpus</span>;
             <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::{<span class="ident">Kind</span>, <span class="ident">ThreadPool</span>};
             <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::<span class="ident">park</span>::<span class="ident">Parker</span>;
-            <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
 
-            <span class="kw">let</span> <span class="ident">core_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="self">self</span>.<span class="ident">max_threads</span>, <span class="ident">num_cpus</span>()));
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">core_threads</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max_threads</span>, <span class="string">&quot;Core threads number cannot be above max limit&quot;</span>);
+            <span class="kw">let</span> <span class="ident">core_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">worker_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus</span>);
 
-            <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_clock</span>();
+            <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver</span>::<span class="ident">Driver</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> (<span class="ident">io_driver</span>, <span class="ident">io_handle</span>) <span class="op">=</span> <span class="ident">io</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_io</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">time_handle</span>) <span class="op">=</span> <span class="ident">time</span>::<span class="ident">create_driver</span>(<span class="self">self</span>.<span class="ident">enable_time</span>, <span class="ident">io_driver</span>, <span class="ident">clock</span>.<span class="ident">clone</span>());
             <span class="kw">let</span> (<span class="ident">scheduler</span>, <span class="ident">launch</span>) <span class="op">=</span> <span class="ident">ThreadPool</span>::<span class="ident">new</span>(<span class="ident">core_threads</span>, <span class="ident">Parker</span>::<span class="ident">new</span>(<span class="ident">driver</span>));
             <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span>::<span class="ident">ThreadPool</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
 
             <span class="comment">// Create the blocking pool</span>
-            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking</span>::<span class="ident">create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_threads</span>);
+            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking</span>::<span class="ident">create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">+</span> <span class="ident">core_threads</span>);
             <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
 
             <span class="comment">// Create the runtime handle</span>
             <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> {
                 <span class="ident">spawner</span>,
-                <span class="ident">io_handle</span>,
-                <span class="ident">time_handle</span>,
-                <span class="ident">clock</span>,
+                <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
+                <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
+                <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
+                <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
                 <span class="ident">blocking_spawner</span>,
             };
 
             <span class="comment">// Spawn the thread pool workers</span>
-            <span class="ident">handle</span>.<span class="ident">enter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">launch</span>.<span class="ident">launch</span>());
+            <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">runtime</span>::<span class="ident">context</span>::<span class="ident">enter</span>(<span class="ident">handle</span>.<span class="ident">clone</span>());
+            <span class="ident">launch</span>.<span class="ident">launch</span>();
 
             <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
                 <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">ThreadPool</span>(<span class="ident">scheduler</span>),
@@ -1027,19 +1081,15 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>()
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Builder</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Builder&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;kind&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;core_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">core_threads</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_threads</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;thread_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">thread_name</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;worker_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">worker_threads</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;max_blocking_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_blocking_threads</span>)
+            .<span class="ident">field</span>(
+                <span class="string">&quot;thread_name&quot;</span>,
+                <span class="kw-2">&amp;</span><span class="string">&quot;&lt;dyn Fn() -&gt; String + Send + Sync + &#39;static&gt;&quot;</span>,
+            )
             .<span class="ident">field</span>(<span class="string">&quot;thread_stack_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">thread_stack_size</span>)
             .<span class="ident">field</span>(<span class="string">&quot;after_start&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after_start</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))
             .<span class="ident">field</span>(<span class="string">&quot;before_stop&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after_start</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))

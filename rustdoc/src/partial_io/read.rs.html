@@ -142,6 +142,7 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
+<span id="142">142</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -153,9 +154,10 @@
 <span class="doccomment">//! This module contains a reader wrapper that breaks its inputs up according to</span>
 <span class="doccomment">//! a provided iterator.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>, <span class="ident">Write</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">cmp</span>, <span class="ident">fmt</span>,
+    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>, <span class="ident">Write</span>},
+};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">make_ops</span>, <span class="ident">PartialOp</span>};
 
