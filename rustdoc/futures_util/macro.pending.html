@@ -6,9 +6,9 @@
     () <span class="op">=</span><span class="op">&gt;</span> { ... };
 }</pre></div>
 </div><div class="docblock"><p>A macro which yields to the event loop once.</p>
-<p>This is equivalent to returning <a href="../futures_util/task/enum.Poll.html"><code>Poll::Pending</code></a>
-from a <a href="../futures_util/future/trait.Future.html#tymethod.poll"><code>Future::poll</code></a> implementation.
-Similarly, when using this macro, it must be ensured that <a href="../futures_util/task/struct.Waker.html#method.wake"><code>wake</code></a>
+<p>This is equivalent to returning <a href="https://doc.rust-lang.org/nightly/core/task/poll/enum.Poll.html"><code>Poll::Pending</code></a>
+from a <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#tymethod.poll"><code>Future::poll</code></a> implementation.
+Similarly, when using this macro, it must be ensured that <a href="https://doc.rust-lang.org/nightly/core/task/wake/struct.Waker.html#method.wake"><code>wake</code></a>
 is called somewhere when further progress can be made.</p>
 <p>This macro is only usable inside of async functions, closures, and blocks.
 It is also gated behind the <code>async-await</code> feature of this library, which is

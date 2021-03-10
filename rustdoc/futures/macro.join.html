@@ -8,7 +8,7 @@
 </div><div class="docblock"><p>Polls multiple futures simultaneously, returning a tuple
 of all results once complete.</p>
 <p>While <code>join!(a, b)</code> is similar to <code>(a.await, b.await)</code>,
-<code>join!</code> polls both futures concurrently and therefore is more efficent.</p>
+<code>join!</code> polls both futures concurrently and therefore is more efficient.</p>
 <p>This macro is only usable inside of async functions, closures, and blocks.
 It is also gated behind the <code>async-await</code> feature of this library, which is
 activated by default.</p>

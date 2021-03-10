@@ -18,7 +18,6 @@ sourcesIndex["libc"] = {"name":"","dirs":[{"name":"unix","dirs":[{"name":"linux_
 sourcesIndex["log"] = {"name":"","files":["lib.rs","macros.rs"]};
 sourcesIndex["memchr"] = {"name":"","dirs":[{"name":"x86","files":["avx.rs","mod.rs","sse2.rs"]}],"files":["fallback.rs","iter.rs","lib.rs","naive.rs"]};
 sourcesIndex["num_cpus"] = {"name":"","files":["lib.rs","linux.rs"]};
-sourcesIndex["once_cell"] = {"name":"","files":["imp_std.rs","lib.rs"]};
 sourcesIndex["partial_io"] = {"name":"","files":["async_read.rs","async_write.rs","futures_util.rs","lib.rs","quickcheck_types.rs","read.rs","write.rs"]};
 sourcesIndex["pin_project"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["pin_project_internal"] = {"name":"","dirs":[{"name":"pin_project","files":["args.rs","attribute.rs","derive.rs","mod.rs"]}],"files":["lib.rs","pinned_drop.rs","utils.rs"]};
