@@ -1,8 +1,8 @@
 (function() {var implementors = {};
 implementors["bytes"] = [{"text":"impl Deref for Bytes","synthetic":false,"types":[]},{"text":"impl Deref for BytesMut","synthetic":false,"types":[]}];
 implementors["futures_executor"] = [{"text":"impl&lt;S:&nbsp;Stream + Unpin&gt; Deref for BlockingStream&lt;S&gt;","synthetic":false,"types":[]}];
-implementors["futures_task"] = [{"text":"impl&lt;'_&gt; Deref for WakerRef&lt;'_&gt;","synthetic":false,"types":[]}];
-implementors["futures_util"] = [{"text":"impl&lt;T:&nbsp;?Sized, '_&gt; Deref for MutexGuard&lt;'_, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;?Sized, U:&nbsp;?Sized, '_&gt; Deref for MappedMutexGuard&lt;'_, T, U&gt;","synthetic":false,"types":[]}];
+implementors["futures_task"] = [{"text":"impl Deref for WakerRef&lt;'_&gt;","synthetic":false,"types":[]}];
+implementors["futures_util"] = [{"text":"impl&lt;T:&nbsp;?Sized&gt; Deref for MutexGuard&lt;'_, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;?Sized, U:&nbsp;?Sized&gt; Deref for MappedMutexGuard&lt;'_, T, U&gt;","synthetic":false,"types":[]}];
 implementors["once_cell"] = [{"text":"impl&lt;T, F:&nbsp;FnOnce() -&gt; T&gt; Deref for Lazy&lt;T, F&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T, F:&nbsp;FnOnce() -&gt; T&gt; Deref for Lazy&lt;T, F&gt;","synthetic":false,"types":[]}];
 implementors["partial_io"] = [{"text":"impl&lt;GE&gt; Deref for PartialWithErrors&lt;GE&gt;","synthetic":false,"types":[]}];
 implementors["regex_syntax"] = [{"text":"impl Deref for Literal","synthetic":false,"types":[]}];
