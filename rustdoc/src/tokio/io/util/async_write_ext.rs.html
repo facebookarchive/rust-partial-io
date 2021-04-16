@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.3.0/src/io/util/async_write_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_write_ext.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.5.0/src/io/util/async_write_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_write_ext.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
@@ -1005,6 +1005,49 @@
 <span id="1002">1002</span>
 <span id="1003">1003</span>
 <span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
+<span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">util</span>::<span class="ident">flush</span>::{<span class="ident">flush</span>, <span class="ident">Flush</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">util</span>::<span class="ident">shutdown</span>::{<span class="ident">shutdown</span>, <span class="ident">Shutdown</span>};
@@ -1019,7 +1062,9 @@
     <span class="ident">WriteU128</span>, <span class="ident">WriteU128Le</span>, <span class="ident">WriteU16</span>, <span class="ident">WriteU16Le</span>, <span class="ident">WriteU32</span>, <span class="ident">WriteU32Le</span>, <span class="ident">WriteU64</span>, <span class="ident">WriteU64Le</span>,
     <span class="ident">WriteU8</span>,
 };
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">util</span>::<span class="ident">write_vectored</span>::{<span class="ident">write_vectored</span>, <span class="ident">WriteVectored</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">AsyncWrite</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">IoSlice</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Buf</span>;
 
@@ -1122,6 +1167,47 @@
             <span class="self">Self</span>: <span class="ident">Unpin</span>,
         {
             <span class="ident">write</span>(<span class="self">self</span>, <span class="ident">src</span>)
+        }
+
+        <span class="doccomment">/// Like [`write`], except that it writes from a slice of buffers.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// Equivalent to:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```ignore</span>
+        <span class="doccomment">/// async fn write_vectored(&amp;mut self, bufs: &amp;[IoSlice&lt;&#39;_&gt;]) -&gt; io::Result&lt;usize&gt;;</span>
+        <span class="doccomment">/// ```</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// See [`AsyncWrite::poll_write_vectored`] for more details.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// # Examples</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// ```no_run</span>
+        <span class="doccomment">/// use tokio::io::{self, AsyncWriteExt};</span>
+        <span class="doccomment">/// use tokio::fs::File;</span>
+        <span class="doccomment">/// use std::io::IoSlice;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// #[tokio::main]</span>
+        <span class="doccomment">/// async fn main() -&gt; io::Result&lt;()&gt; {</span>
+        <span class="doccomment">///     let mut file = File::create(&quot;foo.txt&quot;).await?;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     let bufs: &amp;[_] = &amp;[</span>
+        <span class="doccomment">///         IoSlice::new(b&quot;hello&quot;),</span>
+        <span class="doccomment">///         IoSlice::new(b&quot; &quot;),</span>
+        <span class="doccomment">///         IoSlice::new(b&quot;world&quot;),</span>
+        <span class="doccomment">///     ];</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     file.write_vectored(&amp;bufs).await?;</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">///     Ok(())</span>
+        <span class="doccomment">/// }</span>
+        <span class="doccomment">/// ```</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`write`]: AsyncWriteExt::write</span>
+        <span class="kw">fn</span> <span class="ident">write_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WriteVectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="self">Self</span><span class="op">&gt;</span>
+        <span class="kw">where</span>
+            <span class="self">Self</span>: <span class="ident">Unpin</span>,
+        {
+            <span class="ident">write_vectored</span>(<span class="self">self</span>, <span class="ident">bufs</span>)
         }
 
 

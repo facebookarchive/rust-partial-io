@@ -6,7 +6,7 @@ release, most of the Tokio stream utilities have been moved into the <a href="ht
 crate.</p>
 <h1 id="why-was-stream-not-included-in-tokio-10" class="section-header"><a href="#why-was-stream-not-included-in-tokio-10">Why was <code>Stream</code> not included in Tokio 1.0?</a></h1>
 <p>Originally, we had planned to ship Tokio 1.0 with a stable <code>Stream</code> type
-but unfortunetly the <a href="https://github.com/rust-lang/rfcs/pull/2996">RFC</a> had not been merged in time for <code>Stream</code> to
+but unfortunately the <a href="https://github.com/rust-lang/rfcs/pull/2996">RFC</a> had not been merged in time for <code>Stream</code> to
 reach <code>std</code> on a stable compiler in time for the 1.0 release of Tokio. For
 this reason, the team has decided to move all <code>Stream</code> based utilities to
 the <a href="https://docs.rs/tokio-stream"><code>tokio-stream</code></a> crate. While this is not ideal, once <code>Stream</code> has made
