@@ -385,9 +385,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.5.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83f0c8e7c0addab50b663055baf787d0af7f413a46e6e7fb9559a4e4db7137a5"
+checksum = "01cf844b23c6131f624accf65ce0e4e9956a8bb329400ea5bcc26ae3a5c20b0b"
 dependencies = [
  "autocfg",
  "bytes",
